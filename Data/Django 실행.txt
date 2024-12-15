@@ -1,0 +1,16 @@
+Django 실행
+
+데이터베이스 변동이 있는 경우
+python manage.py migrate
+
+migrate 실행 시 슈퍼 계정 사라지므로 다시 생성
+python manage.py createsuperuser
+
+서버 실행 (local)
+python manage.py runserver
+
+서버 실행 (IP 주소, 포트 지정 IP 주소 제한 X, 포트 8080 예시)
+python manage.py runserver 0:8080
+
+AWS에서 백그라운드로 실행
+nohup python manage.py runserver 0:8080 &
