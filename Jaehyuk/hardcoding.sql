@@ -11,9 +11,47 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema hardcoding
 -- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `hardcoding`;
 CREATE SCHEMA IF NOT EXISTS `hardcoding` DEFAULT CHARACTER SET euckr ;
 SHOW WARNINGS;
 USE `hardcoding` ;
+
+-- -----------------------------------------------------
+-- Table `hardcoding`.`book`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `hardcoding`.`book` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `hardcoding`.`book` (
+  `ID` VARCHAR(10) NOT NULL,
+  `registration` DATE NOT NULL,
+  `get_course` VARCHAR(10) NOT NULL,
+  `DDC` VARCHAR(20) NOT NULL,
+  `ISBN` VARCHAR(20) NOT NULL,
+  `title` VARCHAR(510) NOT NULL,
+  `author` VARCHAR(160) NULL,
+  `publisher` VARCHAR(220) NULL,
+  `publication_year` VARCHAR(60) NULL,
+  `location` VARCHAR(5) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE INDEX `book_id_UNIQUE` (`ID` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `hardcoding`.`rent`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `hardcoding`.`rent` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `hardcoding`.`rent` (
+  `ID` VARCHAR(10) NOT NULL,
+  `rent_date` DATE NOT NULL,
+  `TAG` VARCHAR(5) NOT NULL)
+ENGINE = InnoDB;
+
+SHOW WARNINGS;
 
 -- -----------------------------------------------------
 -- Table `hardcoding`.`rent_count`
@@ -51,48 +89,6 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `hardcoding`.`book`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `hardcoding`.`book` ;
-
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `hardcoding`.`book` (
-  `ID` VARCHAR(10) NOT NULL,
-  `registration` DATE NOT NULL,
-  `get_course` VARCHAR(10) NOT NULL,
-  `DDC` VARCHAR(20) NOT NULL,
-  `ISBN` INT NOT NULL,
-  `title` VARCHAR(510) NOT NULL,
-  `author` VARCHAR(160) NULL,
-  `publisher` VARCHAR(220) NULL,
-  `publication_year` VARCHAR(60) NULL,
-  `location` VARCHAR(5) NOT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE INDEX `book_id_UNIQUE` (`ID` ASC) VISIBLE,
-  CONSTRAINT `ID`
-    FOREIGN KEY (`ID`)
-    REFERENCES `hardcoding`.`rent_count` (`ID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-SHOW WARNINGS;
-
--- -----------------------------------------------------
--- Table `hardcoding`.`rent`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `hardcoding`.`rent` ;
-
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `hardcoding`.`rent` (
-  `ID` VARCHAR(10) NOT NULL,
-  `rent_date` DATE NOT NULL,
-  `TAG` VARCHAR(5) NOT NULL)
-ENGINE = InnoDB;
-
-SHOW WARNINGS;
-
--- -----------------------------------------------------
 -- Table `hardcoding`.`recent_rent`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `hardcoding`.`recent_rent` ;
@@ -114,7 +110,7 @@ DROP TABLE IF EXISTS `hardcoding`.`ISBN_rent_count` ;
 
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `hardcoding`.`ISBN_rent_count` (
-  `ISBN` INT UNSIGNED NOT NULL,
+  `ISBN` VARCHAR(20) NOT NULL,
   `rent_count` INT UNSIGNED ZEROFILL NULL,
   `book_count` INT UNSIGNED ZEROFILL NULL,
   PRIMARY KEY (`ISBN`),
