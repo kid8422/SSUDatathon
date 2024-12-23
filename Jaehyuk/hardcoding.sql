@@ -24,7 +24,8 @@ DROP TABLE IF EXISTS `hardcoding`.`book` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `hardcoding`.`book` (
   `ID` VARCHAR(10) NOT NULL,
-  `registration` DATE NOT NULL,
+  `registration_year` INT UNSIGNED NOT NULL,
+  `registration_month` INT UNSIGNED NOT NULL,
   `get_course` VARCHAR(10) NOT NULL,
   `DDC` VARCHAR(20) NOT NULL,
   `ISBN` VARCHAR(20) NOT NULL,
@@ -48,7 +49,7 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `hardcoding`.`rent` (
   `ID` VARCHAR(10) NOT NULL,
   `rent_date` DATE NOT NULL,
-  `TAG` VARCHAR(5) NOT NULL)
+  `TAG` VARCHAR(5) NULL DEFAULT NULL)
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
