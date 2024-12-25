@@ -5,3 +5,4 @@ datathon/bin/python
 datathon/bin/python3
 datathon/bin/python3.10
 .env
+Haechan/xgb_model_v2.json
