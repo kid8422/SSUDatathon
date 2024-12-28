@@ -22,15 +22,15 @@
         <div class="w-1/4 bg-gray-200 p-6">
             <h1 class="text-6xl font-bold mb-10">2024 SSU 데이터톤</h1>
             <h2 class="text-4xl font-bold mb-10">팀 하드코딩</h2>
-            <h2 class="text-3xl font-bold mb-4">Login</h2>
+            <h2 class="text-3xl font-bold mb-6">Login</h2>
             <form method="POST">
                 <div class="form-field">
+                    <input type="text" id="username" name="username" value="{{ username }}" required autocomplete="off" placeholder="">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" value="{{ username }}" required>
                 </div>
                 <div class="form-field">
+                    <input type="password" id="password" name="password" value="{{ password }}" required autocomplete="off" placeholder="">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" value="{{ password }}" required>
                 </div>
                 {% if error %}
                     <p style="color: red;">{{ error }}</p>
