@@ -1,67 +1,133 @@
 <!DOCTYPE html>
-<html lang="ko" class="min-h-screen">
-<head>
-    <meta charset="UTF-8">
+<html>
+  <head>
+    <meta charset="utf-8" />
     {% load static %}
     {% load humanize %}
+    <!-- 기존 CSS -->
     <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
+    <!-- 기존 JS -->
     <script src="{% static 'main/js/login.js' %}"></script>
+    <script>
+      const BOOK_COUNT_RESULT = JSON.parse('{{ range_list|safe }}');
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2024 SSU 데이터톤</title>
+
+    <!-- Tailwind (이미 사용 중) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 구글 폰트 -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    >
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-        }
+      body {
+        font-family: 'Noto Sans KR', sans-serif;
+      }
     </style>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col gap-10">
-    <div class="flex flex-1">
-        <!-- Sidebar -->
-        <div class="w-1/4 bg-gray-200 p-6">
-            <h1 class="text-6xl font-bold mb-10">2024 SSU 데이터톤</h1>
-            <h2 class="text-4xl font-bold mb-10">팀 하드코딩</h2>
-            <h2 class="text-3xl font-bold mb-6">Login</h2>
+  </head>
+
+  <body>
+    <div class="init">
+      <div class="div">
+        <!-- 오른쪽 파란색 영역 -->
+        <div class="overlap">
+          <!-- 팀명 / 제목 -->
+          <div class="HARD-CODING">
+            HARD<br/>CODING
+          </div>
+
+          <!-- 로그인 폼 (기존) -->
+          <div style="position: absolute; top: 300px; left: 40px; width: 350px;">
+            <h2 class="text-3xl font-bold mb-6 text-white">Login</h2>
             <form method="POST">
-                <div class="form-field">
-                    <input type="text" id="username" name="username" value="{{ username }}" required autocomplete="off" placeholder="">
-                    <label for="username">Username</label>
-                </div>
-                <div class="form-field">
-                    <input type="password" id="password" name="password" value="{{ password }}" required autocomplete="off" placeholder="">
-                    <label for="password">Password</label>
-                </div>
-                {% if error %}
-                    <p style="color: red;">{{ error }}</p>
-                {% endif %}
-                <button type="submit" class="flex items-center p-2 bg-blue-600 text-white rounded shadow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Login
-                </button>
+              {% csrf_token %}
+              <div class="form-field">
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  required
+                  autocomplete="off"
+                  placeholder=""
+                />
+                <label for="username">Username</label>
+              </div>
+              <div class="form-field">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  autocomplete="off"
+                  placeholder=""
+                />
+                <label for="password">Password</label>
+              </div>
+              <button
+                type="submit"
+                class="flex items-center p-2 bg-blue-600 text-white rounded shadow"
+                style="margin-top: 10px;"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Login
+              </button>
             </form>
+          </div>
         </div>
-        <!-- Main Content -->
-        <div class="w-3/4 p-6 overflow-y-auto">
-            <div class="flex items-center mb-6">
-                <h2 class="text-4xl font-bold mr-2">서가 현황</h2>
-                <span id="current-date" class="text-sm text-gray-500"></span>
-            </div>
-            <div class="flex space-x-4 mb-6">
-                <div class="bg-white p-4 rounded shadow w-1/4">
-                    <h3 class="text-lg font-bold text-blue-500">4층 인문</h3>
-                    <p class="text-5xl font-bold text-blue-500">{{ f4_count|intcomma }}</p>
-                    <p class="text-m text-right text-gray-500">권</p>
-                </div>
-                <div class="bg-white p-4 rounded shadow w-1/4">
-                    <h3 class="text-lg font-bold text-blue-500">보존서고</h3>
-                    <p class="text-5xl font-bold text-blue-500">{{ b1_count|intcomma }}</p>
-                    <p class="text-l text-right text-gray-500">권</p>
-                </div>
-            </div>
+
+        <!-- 기존 네모박스 (보존서고 / 4층 인문) 유지 -->
+        <div class="element-3">
+          <div class="overlap-group-3 box-wrapper">
+            <div class="text-wrapper-6">4층 인문</div>
+            <div class="text-wrapper-7">{{ f4_count|intcomma }} 권</div>
+          </div>
         </div>
+        <div class="div-wrapper">
+          <div class="overlap-group-3 box-wrapper">
+            <div class="text-wrapper-8">보존서고</div>
+            <div class="text-wrapper-9">{{ b1_count|intcomma }} 권</div>
+          </div>
+        </div>
+
+        <!-- 코드 리스트 & 파이차트 -->
+        <div class="group-3">
+          <!-- 코드 리스트 -->
+          <div class="code-list">
+            <div class="element-10"><span class="square-tag" data-code="000">000</span>&nbsp;&nbsp;총류</div>
+            <div class="element-10"><span class="square-tag" data-code="100">100</span>&nbsp;&nbsp;철학</div>
+            <div class="element-13"><span class="square-tag" data-code="200">200</span>&nbsp;&nbsp;종교</div>
+            <div class="element-12"><span class="square-tag" data-code="300">300</span>&nbsp;&nbsp;사회과학</div>
+            <div class="element-5"><span class="square-tag" data-code="400">400</span>&nbsp;&nbsp;자연과학</div>
+            <div class="element-11"><span class="square-tag" data-code="500">500</span>&nbsp;&nbsp;기술과학</div>
+            <div class="element-6"><span class="square-tag" data-code="600">600</span>&nbsp;&nbsp;예술</div>
+            <div class="element-7"><span class="square-tag" data-code="700">700</span>&nbsp;&nbsp;언어</div>
+            <div class="element-8"><span class="square-tag" data-code="800">800</span>&nbsp;&nbsp;문학</div>
+            <div class="element-9"><span class="square-tag" data-code="900">900</span>&nbsp;&nbsp;역사</div>
+          </div>
+          <!-- 파이차트: Chart.js를 사용할 Canvas -->
+          <div class="piechart-area">
+            <canvas id="myChart" width="500" height="500"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>
