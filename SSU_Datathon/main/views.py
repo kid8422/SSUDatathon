@@ -40,20 +40,10 @@ def DB_login(request):
         cursor.execute("SELECT count(*) FROM book WHERE location = '보존서고'")
         b1_count = cursor.fetchone()[0]
 
-        cursor.execute("SELECT DDC, location FROM book")
-        raw_data = cursor.fetchall()
-
-        df = pd.DataFrame(raw_data, columns=['DDC', 'location'])
-        df['DDC'] = df['DDC'].astype(float).astype(int)
-
-        bins = range(0, 1001, 100)
-        labels = [f"{x:03d}" for x in range(0, 1000, 100)]
-        df['DDC_range'] = pd.cut(df['DDC'], bins=bins, labels=labels, right=False)
-
-        range_counts = df['DDC_range'].value_counts(sort=False)
-        range_list = range_counts.reindex(labels, fill_value=0).tolist()
+        cursor.execute("SELECT * FROM large_classification WHERE TAG = '전체'")
+        raw_data = cursor.fetchall()[0]
+        range_list = list(raw_data[1:])
         range_json = json.dumps(range_list)
-        print(range_json)
 
     return render(request, 'main/login.html', {
         'b1_count': b1_count,
@@ -104,4 +94,38 @@ def predict_b1(request):
 @login_required(login_url='DB_login')
 def ratio_setting(request):
     return render(request, 'main/predict/ratio_predict.html')
+
+@login_required(login_url='DB_login')
+def load_book_info(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            selected_data = data.get('selectedData', [])  # 선택된 데이터 가져오기
+            
+            raw_list_large = []
+            raw_list_middle = []
+            with connection.cursor() as cursor:
+                for select in selected_data:
+                    cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{select}'")
+                    raw_data = cursor.fetchall()[0]
+                    raw_list_large.append(raw_data)
+
+                    cursor.execute(f"SELECT * FROM middle_classification WHERE TAG = '{select}'")
+                    raw_data = cursor.fetchall()[0]
+                    raw_list_middle.append(raw_data)
+
+            numeric_data_large = [d[1:] for d in raw_list_large]
+            result_large = [sum(x) for x in zip(*numeric_data_large)]
+            result_large_json = json.dumps(result_large)
+
+            numeric_data_middle = [d[1:] for d in raw_list_middle]
+            result_middle = [sum(x) for x in zip(*numeric_data_middle)]
+            result_middle_json = json.dumps(result_middle)
+
+            # 여기서 데이터 처리 로직 추가
+            return JsonResponse({'success': True, 'large': result_large_json, 'middle': result_middle_json})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 

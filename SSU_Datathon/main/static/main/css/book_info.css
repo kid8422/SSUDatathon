@@ -66,6 +66,7 @@ body {
     color: white;               /* 글씨 색상 */
     border-radius: 1vw 1vw 0 0; /* 상단 둥근 모서리 */
     box-shadow: 0px -0.3vh 0.6vh rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    user-select: none; /* 드래그 및 선택 방지 */
 }
 
 
@@ -86,7 +87,11 @@ body {
     font-size: 2vw; /* 폰트 크기 */
     font-weight: 100;
     margin-top: 1vh; /* 상단 여백 */
-    margin-bottom: 10vh;
+    margin-bottom: 2vh;
+    position: absolute;
+    top: 55%; /* 아이콘 아래 위치 */
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .icon-box {
@@ -94,17 +99,80 @@ body {
     flex-direction: column; /* 세로 정렬 */
     align-items: center;    /* 중앙 정렬 */
     justify-content: center;
+    position: absolute;      /* 절대 위치 설정 */
+    top: 40%;                /* 상단 중앙 정렬 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 정확한 중앙 정렬 */
     margin: 0 auto;
-    margin-top: 20vh;        /* 상단 여백 */
+    margin-top: 2vh;        /* 상단 여백 */
 }
 
 .icon {
+    align-items: center;    /* 중앙 정렬 */
+    justify-content: center;
     width: 7vw;
     height: 7vw;
     /* 테두리 제거 및 기본 정렬 */
     border: none;
     transform: none; 
     border-radius: 0.5vw; /* 둥근 모서리 유지 */
+}
+
+.chart {
+    align-items: center;    /* 중앙 정렬 */
+    justify-content: center;
+    position: absolute;
+    top: 50%;                /* 상단 중앙 정렬 */
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#myTable {
+    display: flex;
+    align-items: center;    /* 중앙 정렬 */
+    justify-content: center;
+    position: absolute;
+    top: 50%;                /* 상단 중앙 정렬 */
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.data-table {
+    border-collapse: collapse; /* 셀 테두리 합치기 */
+    width: 50vw; /* 너비를 화면의 90%로 설정 */
+    height: 50vh; /* 높이를 화면의 70%로 설정 */
+    margin: 0 auto; /* 중앙 정렬 */
+    user-select: none; /* 선택 비활성화 */
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #ddd; /* 테두리 */
+    padding: 1vh 1vw; /* 크기 확대 */
+    text-align: center; /* 셀 중앙 정렬 */
+    font-size: 0.9vw; /* 글꼴 크기 확대 */
+}
+
+/* 가로/세로 레이블 (헤더) */
+.header-cell {
+    background-color: white; /* 흰색 배경 */
+    font-weight: bold; /* 굵은 글꼴 */
+    font-size: 1.5vw; /* 레이블 글자 크기 */
+}
+
+/* 데이터 셀 */
+.table-cell {
+    background-color: #f9f9f9; /* 연한 회색 */
+    transition: background-color 0.2s; /* 전환 효과 */
+}
+
+/* 마우스 오버 효과 */
+.table-cell:hover {
+    background-color: #e0e0e0; /* 마우스 오버 시 색상 변경 */
+}
+
+/* 선택 비활성화 */
+.data-table th, .data-table td {
+    user-select: none; /* 드래그 및 선택 방지 */
 }
 
 /* -------------------------------- */
@@ -116,7 +184,8 @@ body {
     display: flex;
     flex-direction: column;
     padding: 1.5vh;             /* 내부 여백 */
-    margin-top: -6vh;  
+    margin-top: -6vh;
+    user-select: none; /* 선택 비활성화 */  
 }
 
 /* 데이터 선택 */
@@ -126,6 +195,7 @@ body {
     border-radius: 1.5vw 1.5vw; /* 둥근 모서리 */
     border-top: none;
     border-left: none; 
+    user-select: none; /* 선택 비활성화 */
 }
 
 .select-header {

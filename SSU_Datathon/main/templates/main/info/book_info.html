@@ -4,7 +4,13 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'main/css/book_info.css' %}">
-<script src="{% static 'main/js/login.js' %}"></script>
+<script src="{% static 'main/js/book_info.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const LARGE_ICON = "{% static 'main/images/bar.svg' %}";
+    const MIDDLE_ICON = "{% static 'main/images/table.svg' %}";
+    const LOAD_DATA = "{% url 'load_book_info' %}";
+</script>
 {% endblock %}
 
 {% block title %}정보 - 도서 현황{% endblock %}
@@ -23,7 +29,9 @@
                 <img src="{% static 'main/images/bar.svg' %}" alt="데이터 없음" class="icon">
             </div>
             <!-- 선택된 데이터 없음 -->
-            <div class="no-data">선택된 데이터가 없습니다</div>
+            <div class="no-data" id="noDataText">선택된 데이터가 없습니다</div>
+            <canvas class="chart" id="myChart" style="display: none;"></canvas>
+            <div class="table" id="myTable" style="display: none;"></div>
         </div>
 
         <!-- 선택창 -->
@@ -37,11 +45,11 @@
                 </div>
                 <div class="option">
                     <input type="checkbox" id="option1" class="checkbox">
-                    <div class="label">4층 인문</div>
+                    <div class="label">4층인문</div>
                 </div>
                 <div class="option">
                     <input type="checkbox" id="option2" class="checkbox">
-                    <div class="label">보존 서고</div>
+                    <div class="label">보존서고</div>
                 </div>
             </div>
             <!-- 버튼 -->
