@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    {% load static %}
+    <!-- 기존 CSS 연결 -->
+    <link rel="stylesheet" href="{% static 'main/css/sidebar.css' %}">
+    <script src="{% static 'main/js/sidebar.js' %}"></script>
+    {% block extra_head %}
+    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}2024 SSU 데이터톤{% endblock %}</title>
+    
+    <!-- Tailwind & Google Fonts 예시(필요 시) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        const LOGOUT = "{% url 'DB_logout' %}";
+        const HOME = "{% url 'DB_home' %}";
+        const BOOK_INFO = "{% url 'book_info' %}";
+        const RENT_INFO = "{% url 'rent_info' %}";
+        const SEARCH_INFO = "{% url 'search_info' %}";
+        const BOOK_SET = "{% url 'book_set' %}";
+        const RENT_SET = "{% url 'rent_set' %}";
+        const EXCEPT_SET = "{% url 'except_set' %}";
+        const F4_PREDICT = "{% url 'f4_predict' %}";
+        const B1_PREDICT = "{% url 'b1_predict' %}";
+        const RATIO_PREDICT = "{% url 'ratio_predict' %}";
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    >
+  </head>
+
+  <body>
+    <div class="main">
+      <!-- =========================== -->
+      <!-- 사이드바 (기본은 open 상태) -->
+      <!-- =========================== -->
+      <aside class="sidebar {% block sidebar_state %}close{% endblock %}" id="sidebar">
+
+        <!-- 화살표 버튼 (우측 상단에 고정) -->
+        <div class="arrow-btn" id="sidebarToggleBtn">
+          <!-- 화살표 아이콘 -->
+          <img src="{% static 'main/images/arrow.svg' %}" alt="toggle arrow" />
+        </div>
+
+        <!-- 사이드바 상단: Home 아이콘 + "홈" 텍스트 -->
+        <div class="sidebar-top">
+          <a class="sidebar-top-icon" href="#" onclick="location.href=HOME">
+            <!-- Home 아이콘 -->
+            <img src="{% static 'main/images/home.svg' %}" alt="Home" />
+          </a>
+          <!-- 홈 텍스트 (원한다면 사이드바 닫으면 사라지게 처리 가능) -->
+          <a class="sidebar-top-text" href="#" onclick="location.href=HOME">홈</a>
+        </div>
+
+        <!-- 아래 부분: 대분류 + 중분류 (정보, 데이터관리, 예측 등) -->
+        <div class="sidebar-menu-container">
+          <!-- 정보 (대분류) -->
+          <div class="sidebar-menu-item info-menu">
+            <div class="menu-icon" id="menuIconBtn">
+              <!-- 대분류 아이콘 -->
+              <img src="{% static 'main/images/graph.svg' %}" alt="정보 아이콘" />
+            </div>
+            <div class="menu-text">정보</div>
+            <!-- 중분류 -->
+            <div class="sub-menu">
+              <a class="sub-menu-text" href="#" onclick="location.href=BOOK_INFO">도서현황</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=RENT_INFO">대출현황</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=SEARCH_INFO">도서검색</a>
+            </div>
+          </div>
+
+          <!-- 데이터 관리 (대분류) -->
+          <div class="sidebar-menu-item data-menu">
+            <div class="menu-icon" id="menuIconBtn">
+              <img src="{% static 'main/images/data.svg' %}" alt="데이터 아이콘" />
+            </div>
+            <div class="menu-text">데이터 관리</div>
+            <!-- 중분류 -->
+            <div class="sub-menu">
+              <a class="sub-menu-text" href="#" onclick="location.href=BOOK_SET">도서정보</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=RENT_SET">대출정보</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=EXCEPT_SET">예외도서</a>
+            </div>
+          </div>
+
+          <!-- 도서 이용 예측 (대분류) -->
+          <div class="sidebar-menu-item predict-menu">
+            <div class="menu-icon" id="menuIconBtn">
+              <img src="{% static 'main/images/search.svg' %}" alt="예측 아이콘" />
+            </div>
+            <div class="menu-text">도서 이용 예측</div>
+            <!-- 중분류 -->
+            <div class="sub-menu">
+              <a class="sub-menu-text" href="#" onclick="location.href=F4_PREDICT">4층인문 예측</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=B1_PREDICT">보존서고 예측</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=RATIO_PREDICT">분류별 최소치</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 로그아웃 버튼 -->
+        <div class="logout-btn" onclick="location.href=LOGOUT">
+          <div class="logout-bg"></div>
+          <div class="logout-text">Logout</div>
+        </div>
+      </aside>
+      <!-- 메인 컨텐츠 -->
+      <main class="main-content">
+        {% block content %}
+        <!-- 각 페이지별 내용 -->
+        {% endblock content %}
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    {% load static %}
+    <!-- 기존 CSS 연결 -->
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <script src="{% static 'main/js/main.js' %}"></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024 SSU 데이터톤</title>
+    
+    <!-- Tailwind & Google Fonts 예시(필요 시) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
+      rel="stylesheet"
+    >
+  </head>
+
+  <body>
+    <div class="layout-container">
+      <!-- =========================== -->
+      <!-- 사이드바 (기본은 open 상태) -->
+      <!-- =========================== -->
+      <aside class="sidebar open" id="sidebar">
+
+        <!-- 화살표 버튼 (우측 상단에 고정) -->
+        <div class="arrow-btn" id="sidebarToggleBtn">
+          <!-- 화살표 아이콘 -->
+          <img src="{% static 'main/images/arrow.svg' %}" alt="toggle arrow" />
+        </div>
+
+        <!-- 사이드바 상단: Home 아이콘 + "홈" 텍스트 -->
+        <div class="sidebar-top">
+          <div class="sidebar-top-icon">
+            <!-- Home 아이콘 -->
+            <img src="{% static 'main/images/home.svg' %}" alt="Home" />
+          </div>
+          <!-- 홈 텍스트 (원한다면 사이드바 닫으면 사라지게 처리 가능) -->
+          <div class="sidebar-top-text">홈</div>
+        </div>
+
+        <!-- 아래 부분: 대분류 + 중분류 (정보, 데이터관리, 예측 등) -->
+        <div class="sidebar-menu-container">
+          <!-- 정보 (대분류) -->
+          <div class="sidebar-menu-item info-menu">
+            <div class="menu-icon">
+              <!-- 대분류 아이콘 -->
+              <img src="{% static 'main/images/graph.svg' %}" alt="정보 아이콘" />
+            </div>
+            <div class="menu-text">정보</div>
+            <!-- 중분류 -->
+            <div class="sub-menu">
+              <div class="sub-menu-text">도서현황</div>
+              <div class="sub-menu-text">대출현황</div>
+              <div class="sub-menu-text">도서검색</div>
+            </div>
+          </div>
+
+          <!-- 데이터 관리 (대분류) -->
+          <div class="sidebar-menu-item data-menu">
+            <div class="menu-icon">
+              <img src="{% static 'main/images/data.svg' %}" alt="데이터 아이콘" />
+            </div>
+            <div class="menu-text">데이터 관리</div>
+            <!-- 중분류 -->
+            <div class="sub-menu">
+              <div class="sub-menu-text">도서정보</div>
+              <div class="sub-menu-text">대출정보</div>
+              <div class="sub-menu-text">예외도서</div>
+            </div>
+          </div>
+
+          <!-- 도서 이용 예측 (대분류) -->
+          <div class="sidebar-menu-item predict-menu">
+            <div class="menu-icon">
+              <img src="{% static 'main/images/search.svg' %}" alt="예측 아이콘" />
+            </div>
+            <div class="menu-text">도서 이용 예측</div>
+            <!-- 중분류 -->
+            <div class="sub-menu">
+              <div class="sub-menu-text">4층인문 예측</div>
+              <div class="sub-menu-text">보존서고 예측</div>
+              <div class="sub-menu-text">분류별 최소치</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 로그아웃 버튼 -->
+        <div class="logout-btn">
+          <div class="logout-bg"></div>
+          <div class="logout-text">Logout</div>
+        </div>
+      </aside>
+
+      <!-- 메인 컨텐츠 -->
+      <main class="main-content">
+        <!-- 예시 카드들 -->
+        <div class="info-card">
+            <!-- 왼쪽 영역: 아이콘 + 제목 -->
+            <div class="left-container">
+                <div class="card-icon">
+                    <img src="{% static 'main/images/graph.svg' %}" alt="정보 아이콘" class="icon-black">
+                </div>
+                <span class="card-title">정보</span>
+            </div>
+            <!-- 구분선 -->
+            <div class="divider">|</div>
+            <!-- 오른쪽 영역: 부제목 -->
+            <div class="right-container">
+                <span class="card-subtitle">도서관 정보 시각화</span>
+            </div>
+        </div>
+        <div class="info-card">
+            <!-- 왼쪽 영역: 아이콘 + 제목 -->
+            <div class="left-container">
+                <div class="card-icon">
+                    <img src="{% static 'main/images/data.svg' %}" alt="데이터 관리 아이콘" class="icon-black">
+                </div>
+                <span class="card-title">데이터 관리</span>
+            </div>
+            <!-- 구분선 -->
+            <div class="divider">|</div>
+            <!-- 오른쪽 영역: 부제목 -->
+            <div class="right-container">
+                <span class="card-subtitle">실제 도서 정보 데이터베이스로 관리</span>
+            </div>
+        </div>
+        <div class="info-card">
+            <!-- 왼쪽 영역: 아이콘 + 제목 -->
+            <div class="left-container">
+                <div class="card-icon">
+                    <img src="{% static 'main/images/search.svg' %}" alt="도서 이용 예측 아이콘" class="icon-black">
+                </div>
+                <span class="card-title">도서 이용 예측</span>
+            </div>
+            <!-- 구분선 -->
+            <div class="divider">|</div>
+            <!-- 오른쪽 영역: 부제목 -->
+            <div class="right-container">
+                <span class="card-subtitle">머신러닝을 활용한 도서 수요 예측</span>
+            </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

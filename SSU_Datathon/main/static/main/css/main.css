@@ -1,0 +1,80 @@
+/* 기본 리셋 / 전역 스타일 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #FAFAFA;
+}
+
+/* 카드 공통 스타일 */
+.info-card {
+  display: flex;                      /* 가로 정렬 */
+  align-items: center;                /* 세로 중앙 정렬 */
+  gap: 2vw;                           /* 요소 간 간격 */
+  width: 100%;                        /* 최대 너비 */
+  background: #fff;
+  border-radius: 2.5vw;               /* 둥근 모서리 */
+  box-shadow: 0 0.5vw 0.5vw rgba(0, 0, 0, 0.25); /* 그림자 */
+  padding: 3vh 4vw;                   /* 내부 패딩 */
+  margin: 3vh auto;                    /* 카드 간격 및 중앙 정렬 */
+  padding-left: 2vw;                  /* 왼쪽 패딩 추가 */
+  margin-left: 2vw;                   /* 전체 박스를 오른쪽으로 이동 */
+}
+
+/* 왼쪽 영역 (아이콘 + 제목) */
+.left-container {
+  display: flex;                      /* 가로 정렬 */
+  align-items: center;                /* 세로 중앙 정렬 */
+  gap: 1.5vw;                         /* 아이콘과 텍스트 간격 */
+  flex: 1;                            /* 동일한 크기로 확장 */
+}
+
+/* 아이콘 */
+.card-icon {
+  width: 7vh;                         /* 아이콘 영역 크기 */
+  height: 7vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-icon img {
+  width: 6vh;                         /* 아이콘 크기 */
+  height: 6vh;
+  filter: invert(0%) brightness(0%);  /* 검정색 아이콘 */
+}
+
+/* 제목 */
+.card-title {
+  font-size: 3.5vw;                     /* 제목 크기 */
+  font-weight: 800;
+  color: black;
+}
+
+/* 구분선 (|) */
+.divider {
+  font-size: 4vw;                     /* 구분선 크기 */
+  font-weight: 500;
+  color: gray;
+  text-align: center;
+  padding: 0 2vw;                     /* 구분선 좌우 여백 */
+}
+
+/* 오른쪽 영역 (부제목) */
+.right-container {
+  flex: 1;                            /* 동일한 크기로 확장 */
+  text-align: left;                    /* 왼쪽 정렬 */
+}
+
+/* 부제목 */
+.card-subtitle {
+  font-size: 2.5vw;                    /* 부제목 크기 */
+  font-weight: 500;
+  color: gray;
+  line-height: 1.4;                     /* 줄간격 */
+  white-space: normal;                  /* 단어 단위 줄바꿈 */
+  word-break: keep-all;                 /* 단어 단위 줄바꿈 유지 */
+}

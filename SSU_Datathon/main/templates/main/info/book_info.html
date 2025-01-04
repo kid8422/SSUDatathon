@@ -1,0 +1,55 @@
+<!-- 정보 - 도서 현황 -->
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'main/css/book_info.css' %}">
+<script src="{% static 'main/js/login.js' %}"></script>
+{% endblock %}
+
+{% block title %}정보 - 도서 현황{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="tabs">
+                <!-- 대분류/중분류 탭 -->
+                <div class="content-tab active">대분류</div>
+                <div class="content-tab">중분류</div>
+            </div>
+            <div class="icon-box">
+                <img src="{% static 'main/images/bar.svg' %}" alt="데이터 없음" class="icon">
+            </div>
+            <!-- 선택된 데이터 없음 -->
+            <div class="no-data">선택된 데이터가 없습니다</div>
+        </div>
+
+        <!-- 선택창 -->
+        <div class="select-box">
+            <!-- 데이터 선택 -->
+            <div class="selection-box">
+                <div class="select-header">데이터 선택</div>
+                <div class="option">
+                    <input type="checkbox" id="optionAll" class="checkbox">
+                    <div class="label">전체 선택</div>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="option1" class="checkbox">
+                    <div class="label">4층 인문</div>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="option2" class="checkbox">
+                    <div class="label">보존 서고</div>
+                </div>
+            </div>
+            <!-- 버튼 -->
+            <div class="buttons">
+                <div class="button confirm">확인</div>
+                <div class="button reset">초기화</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,194 @@
+/* 기본 설정 */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FAFAFA;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+}
+
+/* 최상위 레이아웃 컨테이너 */
+.layout-container {
+    display: flex; /* 가로 정렬 */
+    height: 100vh; /* 전체 화면 높이 */
+    width: 100vw; /* 전체 화면 너비 */
+}
+
+/* 메인 컨테이너 */
+.container {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    align-items: center;     /* 수직 중앙 정렬 */
+    height: 100vh;           /* 전체 높이 */
+    padding: 2vw;            /* 내부 패딩 */
+}
+
+.content-container {
+    display: flex;
+    flex-direction: row; /* 가로 정렬 */
+    width: 100%; /* 화면 전체 너비 */
+    flex-grow: 1; /* 남은 공간 차지 */
+    padding: 2vh; /* 내부 패딩 */
+    gap: 1.5vw; /* 요소 간 간격 */
+}
+
+/* 도서 현황 박스 */
+.content-box {
+    width: 60vw;               /* 너비 비율 고정 */
+    height: 70vh;              /* 높이 비율 고정 */
+    background: white;
+    border: 0.2vw solid #D9D9D9; /* 테두리 추가 */
+    border-top: none;
+    border-left: none;   
+    box-shadow: 0.2vw 0.4vh 0.4vh rgba(0, 0, 0, 0.25); /* 그림자 */
+    border-radius: 0.5vw;         /* 둥근 모서리 */
+    position: relative;         /* 상대 위치 기준 */
+    justify-content: center;     /* 가로 중앙 정렬 */
+    align-items: center;         /* 세로 중앙 정렬 */
+}
+
+/* 탭 설정 */
+.tabs {
+    display: flex;
+    gap: 1vw;                   /* 버튼 간 간격 */
+    position: absolute;         /* 컨텐츠 박스를 기준으로 절대 위치 */
+    transform: translateY(-90%); /* 위쪽 이동 */
+    left: 0;                    /* 박스 왼쪽 끝에 고정 */
+}
+
+.content-tab {
+    padding: 1vh 2.4vw;           /* 내부 패딩 */
+    font-size: 1.2vw;           /* 글씨 크기 */
+    font-weight: 600;           /* 글씨 두께 */
+    cursor: pointer;
+    background: #3BA4FF;        /* 배경색 */
+    color: white;               /* 글씨 색상 */
+    border-radius: 1vw 1vw 0 0; /* 상단 둥근 모서리 */
+    box-shadow: 0px -0.3vh 0.6vh rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+}
+
+
+.content-tab.active {
+    background: #3BA4FF;           /* 활성화 배경색 */
+    color: white;                  /* 활성화 글씨 색상 */
+}
+
+.content-tab:not(.active) {
+    background: white;             /* 비활성화 배경색 */
+    color: #D9D9D9;                /* 비활성화 글씨 색상 */
+}
+
+/* 선택된 데이터 없음 */
+.no-data {
+    text-align: center;
+    color: rgba(153, 151, 152, 0.90);
+    font-size: 2vw; /* 폰트 크기 */
+    font-weight: 100;
+    margin-top: 1vh; /* 상단 여백 */
+    margin-bottom: 10vh;
+}
+
+.icon-box {
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    align-items: center;    /* 중앙 정렬 */
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: 20vh;        /* 상단 여백 */
+}
+
+.icon {
+    width: 7vw;
+    height: 7vw;
+    /* 테두리 제거 및 기본 정렬 */
+    border: none;
+    transform: none; 
+    border-radius: 0.5vw; /* 둥근 모서리 유지 */
+}
+
+/* -------------------------------- */
+
+/* 선택창 */
+.select-box {
+    width: 20vw; /* 선택 박스 너비 */
+    height: 78vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5vh;             /* 내부 여백 */
+    margin-top: -6vh;  
+}
+
+/* 데이터 선택 */
+.selection-box {
+    flex-grow: 1;
+    border: 0.2vw solid #D9D9D9; /* 테두리 추가 */
+    border-radius: 1.5vw 1.5vw; /* 둥근 모서리 */
+    border-top: none;
+    border-left: none; 
+}
+
+.select-header {
+    background: #3BA4FF;
+    color: white;
+    font-size: 2vw; /* 폰트 크기 */
+    font-weight: 600;
+    text-align: center;
+    padding: 1vh; /* 패딩 */
+    border-radius: 1.5vw 1.5vw 0 0; /* 둥근 모서리 */
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    margin: 2vh 0; /* 상하 여백 */
+    padding-left: 3vw;         /* 왼쪽 마진 추가 */
+}
+
+.checkbox {
+    width: 2vw; /* 체크박스 크기 */
+    height: 2vw;
+    border: 0.2vw solid black;
+    background: white;
+    margin-right: 1vw; /* 우측 여백 */
+    cursor: pointer;           /* 클릭 가능 커서 */
+}
+
+.checkbox input[type="checkbox"] {
+    display: none;             /* 기본 체크박스 숨김 */
+}
+
+.checkbox input[type="checkbox"]:checked + label::before {
+    content: '✔';              /* 체크 표시 추가 */
+    font-size: 1.2em;          /* 체크 크기 */
+    color: #3BA4FF;            /* 체크 색상 */
+}
+
+.label {
+    font-size: 1.5vw; /* 폰트 크기 */
+    font-weight: 500;
+    text-align: center;        /* 글씨 중앙 정렬 */
+}
+
+/* 버튼 */
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 1vh; /* 내부 패딩 */
+    gap: 1vw;                       /* 버튼 간격 추가 */
+    margin-top: 2vh;
+}
+
+.button {
+    width: 9vw; /* 버튼 너비 */
+    height: 4vh; /* 버튼 높이 */
+    background: white;
+    box-shadow: 0.2vw 0.4vh 0.4vh rgba(0, 0, 0, 0.25); /* 그림자 */
+    border-radius: 1.2vw; /* 둥근 모서리 */
+    text-align: center;
+    line-height: 4vh; /* 텍스트 수직 중앙 정렬 */
+    font-size: 1.3vw; /* 폰트 크기 */
+    font-weight: 500;
+    cursor: pointer;          /* 클릭 가능 커서 */
+}

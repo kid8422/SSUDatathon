@@ -67,7 +67,41 @@ def DB_logout(request):
 
 @login_required(login_url='DB_login')
 def DB_home(request):
-    # DB 테이블 이름 가져오기
-    with connection.cursor() as cursor:
-        cursor.execute("SHOW TABLES;")
-    return render(request, 'main/home.html')
+    return render(request, 'main/main.html')
+
+@login_required(login_url='DB_login')
+def book_info(request):
+    return render(request, 'main/info/book_info.html')
+
+@login_required(login_url='DB_login')
+def rent_info(request):
+    return render(request, 'main/info/rent_info.html')
+
+@login_required(login_url='DB_login')
+def search(request):
+    return render(request, 'main/info/search_info.html')
+
+@login_required(login_url='DB_login')
+def DB_book(request):
+    return render(request, 'main/set/book_set.html')
+
+@login_required(login_url='DB_login')
+def DB_rent(request):
+    return render(request, 'main/set/rent_set.html')
+
+@login_required(login_url='DB_login')
+def DB_except(request):
+    return render(request, 'main/set/except_set.html')
+
+@login_required(login_url='DB_login')
+def predict_f4(request):
+    return render(request, 'main/predict/f4_predict.html')
+
+@login_required(login_url='DB_login')
+def predict_b1(request):
+    return render(request, 'main/predict/b1_predict.html')
+
+@login_required(login_url='DB_login')
+def ratio_setting(request):
+    return render(request, 'main/predict/ratio_predict.html')
+

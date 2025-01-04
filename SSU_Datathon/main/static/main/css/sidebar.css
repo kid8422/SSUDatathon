@@ -1,0 +1,210 @@
+/* 기본 상태는 open, 닫을 땐 .close */
+.main {
+  flex-direction: row;
+  display: flex;
+  flex: 1;
+  position: relative;
+  min-height: 100vh; /* 세로 전체 화면 채우기 */
+}
+.sidebar {
+    user-select: none;       /* 텍스트 선택 방지 */
+    background: #3BA4FF;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: width 0.3s ease;
+  }
+  /* 열림 상태: 300px (원본대로) */
+  .sidebar.open {
+    width: 300px;
+  }
+  /* 닫힘 상태: 80px (아이콘만 보이게) */
+  .sidebar.close {
+    width: 70px;
+  }
+  
+  /* ==== 화살표 버튼 (사이드바 우측 상단) ==== */
+  .arrow-btn {
+    position: absolute;
+    top: 20px;
+    right: -32px;
+    width: 40px;
+    height: 40px;
+    z-index: 101; 
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background: #3BA4FF;
+    transition: transform 0.3s ease;
+  }
+  .arrow-btn img {
+    width: 24px;
+    height: 24px;
+  }
+  /* 닫힐 때 화살표 180도 회전 */
+  .sidebar.close .arrow-btn {
+    transform: rotate(180deg);
+  }
+
+  .sidebar.close .menu-icon {
+    cursor: pointer;
+  }
+  
+  /* ===================== */
+  /* 사이드바 상단(홈 아이콘) */
+  /* ===================== */
+  .sidebar-top {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;  /* 왼쪽 여백 (아이콘이 너무 붙지 않도록) */
+  }
+  .sidebar-top-icon {
+    /* 기존 58px → 48px */
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border-radius: 4px;         /* 다른 아이콘처럼 모서리 둥글게 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;             /* 부모가 작아져도 줄어들지 않도록 */
+  }
+
+  .sidebar-top-icon img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  /* 홈 텍스트 */
+  .sidebar-top-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    margin-left: 10px; /* 홈 아이콘과 텍스트 사이 간격 */
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* 닫힘 상태에서 홈 텍스트 숨김 */
+  .sidebar.close .sidebar-top-text {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  /* 사이드바 메뉴들을 담는 영역 */
+  .sidebar-menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 20px 20px 20px; /* 좌우에 여백, 아이콘이 너무 붙지 않도록 */
+  }
+  
+  /* 개별 메뉴 아이템 (대분류) */
+  .sidebar-menu-item {
+    position: relative;
+    padding-left: 60px; /* 아이콘 오른쪽에 텍스트 배치 */
+    min-height: 60px;
+  }
+  
+  /* 아이콘 기본 스타일 */
+  .menu-icon {
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    position: absolute;
+    left: -10px;
+    top: 6px;
+    border-radius: 4px;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+  }
+
+  .menu-icon img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* 대분류 글씨 */
+  .menu-text {
+    font-size: 1.8rem;  /* 사용자 원본 유지 */
+    font-weight: 800;
+    color: white;
+    line-height: 60px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* 중분류 (.sub-menu) */
+  .sub-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    /* 살짝 안쪽으로 들여쓰기하고 싶다면, margin-left 추가 */
+    margin-left: 15px; /* 예시 */
+  }
+  .sub-menu-text {
+    font-size: 1.2rem; /* 사용자 원본 유지 */
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* 닫힘 상태에서 대분류, 중분류 텍스트 사라짐 */
+  .sidebar.close .menu-text,
+  .sidebar.close .sub-menu-text {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  /* 로그아웃 버튼 */
+  .logout-btn {
+    position: absolute;  /* 절대 위치 설정 */
+    bottom: 10px;        /* 아래에서 20px 떨어진 위치 */
+    right: 20px;         /* 오른쪽에서 20px 떨어진 위치 */
+    width: 90px;
+    height: 36px;
+    padding: 8px 16px;   /* 버튼 내부 패딩 (위아래 8px, 좌우 16px) */
+    border-radius: 10px; /* 모서리를 둥글게 */
+    background: black;   /* 버튼 배경 */
+    color: white;        /* 텍스트 색상 */
+    font-size: 1rem;     /* 글자 크기 */
+    font-weight: 700;    /* 글자 두께 */
+    text-align: center;  /* 텍스트 중앙 정렬 */
+    cursor: pointer;     /* 클릭 가능 마우스 포인터 */
+  }
+  
+  /* 닫힘 상태에서 로그아웃 버튼 숨김 */
+  .sidebar.close .logout-btn {
+    display: none;
+  }
+  
+  .logout-bg {
+    width: 90px;
+    height: 36px;
+    background: black;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .logout-text {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 90px;
+    height: 32px;
+    text-align: center;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 32px;
+  }

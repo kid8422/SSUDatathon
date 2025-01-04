@@ -4,25 +4,18 @@
     <meta charset="utf-8" />
     {% load static %}
     {% load humanize %}
-    <!-- 기존 CSS -->
     <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
-    <!-- 기존 JS -->
     <script src="{% static 'main/js/login.js' %}"></script>
     <script>
       const BOOK_COUNT_RESULT = JSON.parse('{{ range_list|safe }}');
     </script>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2024 SSU 데이터톤</title>
-
-    <!-- Tailwind (이미 사용 중) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 구글 폰트 -->
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
       rel="stylesheet"
     >
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       body {
@@ -38,11 +31,11 @@
         <div class="overlap">
           <!-- 팀명 / 제목 -->
           <div class="HARD-CODING">
-            HARD<br/>CODING
+            HARD<br />CODING
           </div>
 
-          <!-- 로그인 폼 (기존) -->
-          <div style="position: absolute; top: 300px; left: 40px; width: 350px;">
+          <!-- 로그인 폼: HARD CODING 바로 아래 배치 -->
+          <div class="login-form">
             <h2 class="text-3xl font-bold mb-6 text-white">Login</h2>
             <form method="POST">
               {% csrf_token %}
@@ -68,32 +61,33 @@
                 />
                 <label for="password">Password</label>
               </div>
-              <button
-                type="submit"
-                class="flex items-center p-2 bg-blue-600 text-white rounded shadow"
-                style="margin-top: 10px;"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <div class="text-right mt-4">
+                <button
+                  type="submit"
+                  class="inline-flex items-center px-4 py-2 bg-black text-white rounded shadow"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Login
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  Login
+                </button>
+              </div>
             </form>
           </div>
         </div>
 
-        <!-- 기존 네모박스 (보존서고 / 4층 인문) 유지 -->
+        <!-- 기존 네모박스 (보존서고 / 4층 인문) -->
         <div class="element-3">
           <div class="overlap-group-3 box-wrapper">
             <div class="text-wrapper-6">4층 인문</div>
@@ -124,7 +118,7 @@
           </div>
           <!-- 파이차트: Chart.js를 사용할 Canvas -->
           <div class="piechart-area">
-            <canvas id="myChart" width="500" height="500"></canvas>
+            <canvas id="myChart" width="450" height="450"></canvas>
           </div>
         </div>
       </div>

@@ -1,0 +1,58 @@
+<!-- 도서 이용 예측 - 분류별 최소치 지정 -->
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+<script src="{% static 'main/js/main.js' %}"></script>
+{% endblock %}
+
+{% block title %}도서 이용 예측 - 분류별 최소치 지정{% endblock %}
+
+{% block content %}
+<div class="info-card">
+    <!-- 왼쪽 영역: 아이콘 + 제목 -->
+    <div class="left-container">
+        <div class="card-icon">
+            <img src="{% static 'main/images/graph.svg' %}" alt="정보 아이콘" class="icon-black">
+        </div>
+        <span class="card-title">정보</span>
+    </div>
+    <!-- 구분선 -->
+    <div class="divider">|</div>
+    <!-- 오른쪽 영역: 부제목 -->
+    <div class="right-container">
+        <span class="card-subtitle">도서관 정보 시각화</span>
+    </div>
+</div>
+<div class="info-card">
+    <!-- 왼쪽 영역: 아이콘 + 제목 -->
+    <div class="left-container">
+        <div class="card-icon">
+            <img src="{% static 'main/images/data.svg' %}" alt="데이터 관리 아이콘" class="icon-black">
+        </div>
+        <span class="card-title">데이터 관리</span>
+    </div>
+    <!-- 구분선 -->
+    <div class="divider">|</div>
+    <!-- 오른쪽 영역: 부제목 -->
+    <div class="right-container">
+        <span class="card-subtitle">실제 도서 정보 데이터베이스로 관리</span>
+    </div>
+</div>
+<div class="info-card">
+    <!-- 왼쪽 영역: 아이콘 + 제목 -->
+    <div class="left-container">
+        <div class="card-icon">
+            <img src="{% static 'main/images/search.svg' %}" alt="도서 이용 예측 아이콘" class="icon-black">
+        </div>
+        <span class="card-title">도서 이용 예측</span>
+    </div>
+    <!-- 구분선 -->
+    <div class="divider">|</div>
+    <!-- 오른쪽 영역: 부제목 -->
+    <div class="right-container">
+        <span class="card-subtitle">머신러닝을 활용한 도서 수요 예측</span>
+    </div>
+</div>
+{% endblock content %}
