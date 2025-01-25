@@ -67,8 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .filter(option => option.checked)
             .map(option => option.nextElementSibling.innerText);
 
-        console.log("선택된 데이터:", checkedOptions);
-
         // 데이터가 선택되지 않았을 경우 초기화 상태로 복귀
         if (checkedOptions.length === 0) {
             showNoData();
@@ -100,7 +98,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const result = await response.json();
-            console.log("서버 응답 데이터:", result);
 
             // 데이터 저장
             storedData.large = result.large
@@ -121,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         } catch (error) {
-            console.error("데이터 로드 실패: ", error);
             showNoData();
         }
     }
@@ -257,18 +253,18 @@ document.addEventListener("DOMContentLoaded", function () {
         if (chartInstance) chartInstance.destroy();
         chartContainer.querySelectorAll("table").forEach(el => el.remove());
     }
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie) {
-            const cookies = document.cookie.split(";");
-            cookies.forEach(cookie => {
-                cookie = cookie.trim();
-                if (cookie.startsWith(name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.split("=")[1]);
-                }
-            });
-        }
-        return cookieValue;
-    }
 });
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        const cookies = document.cookie.split(";");
+        cookies.forEach(cookie => {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.split("=")[1]);
+            }
+        });
+    }
+    return cookieValue;
+}

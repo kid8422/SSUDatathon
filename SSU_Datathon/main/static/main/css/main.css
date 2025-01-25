@@ -9,6 +9,18 @@ body {
   background: #FAFAFA;
 }
 
+.info-box {
+  display: flex;
+  align-items: center;    /* 중앙 정렬 */
+  justify-content: center;
+  position: relative;
+  top: 50%;                /* 상단 중앙 정렬 */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  flex-direction: column; /* 가로 정렬 */
+  user-select: none; /* 드래그 및 선택 방지 */
+}
+
 /* 카드 공통 스타일 */
 .info-card {
   display: flex;                      /* 가로 정렬 */

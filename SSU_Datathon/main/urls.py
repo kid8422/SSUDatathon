@@ -15,5 +15,6 @@ urlpatterns = [
     path('predict_b1/', views.predict_b1, name='b1_predict'),
     path('ratio_setting/', views.ratio_setting, name='ratio_predict'),
     path('load_book_info/', views.load_book_info, name='load_book_info'),
-    #path('login-redirect/', views.login_redirect, name='login_redirect'),
+    path('autocomplete/', views.autocomplete, name='autocomplete'),
+    path('book_search/', views.book_search, name='book_search'),
 ]

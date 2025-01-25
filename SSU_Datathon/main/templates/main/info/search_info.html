@@ -3,56 +3,61 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'main/css/main.css' %}">
-<script src="{% static 'main/js/main.js' %}"></script>
+<link rel="stylesheet" href="{% static 'main/css/search_info.css' %}">
+<script src="{% static 'main/js/search_info.js' %}"></script>
+<script>
+    const SEARCH_AUTOCOMPLETE = "{% url 'autocomplete' %}";
+    const SEARCH_BOOK = "{% url 'book_search' %}";
+</script>
 {% endblock %}
 
-{% block title %}정보 - 도서 검색{% endblock %}
+{% block title %}정보 - 도서검색{% endblock %}
 
 {% block content %}
-<div class="info-card">
-    <!-- 왼쪽 영역: 아이콘 + 제목 -->
-    <div class="left-container">
-        <div class="card-icon">
-            <img src="{% static 'main/images/graph.svg' %}" alt="정보 아이콘" class="icon-black">
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="Ctabs">
+                <!-- 대분류/중분류 탭 -->
+                <div class="content-tab">도서검색</div>
+            </div>
+            <div class="search">
+                <div class="search-button">
+                    <div class="search-button-rectangle">
+                        <div class="search-icon-container">
+                            <img src="{% static 'main/images/menu.svg' %}" alt="처음으로" class="search-icon">
+                        </div>
+                    </div>
+                </div>
+                <div class="search-rectangle">
+                    <!-- 도서명 입력 필드 -->
+                    <label for="book-search-input" class="sr-only">도서명 검색</label>
+                    <input
+                        type="text"
+                        id="book-search-input"
+                        class="book-name-input"
+                        placeholder="도서명을 입력하세요"
+                        aria-label="도서명 검색"
+                    >
+                </div>
+                <div class="search-button">
+                    <div class="search-button-rectangle" id="on-search-button">
+                        <div class="search-icon-container">
+                            <img src="{% static 'main/images/book_search.svg' %}" alt="도서검색" class="search-icon">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="icon-box">
+                <img src="{% static 'main/images/book.svg' %}" alt="데이터 없음" class="icon">
+            </div>
+            <!-- 선택된 데이터 없음 -->
+            <div class="no-data" id="noDataText">도서정보를 찾을 수 없습니다</div>
+            <canvas class="chart" id="myChart" style="display: none;"></canvas>
+            <div class="table" id="myTable" style="display: none;"></div>
         </div>
-        <span class="card-title">정보</span>
-    </div>
-    <!-- 구분선 -->
-    <div class="divider">|</div>
-    <!-- 오른쪽 영역: 부제목 -->
-    <div class="right-container">
-        <span class="card-subtitle">도서관 정보 시각화</span>
-    </div>
-</div>
-<div class="info-card">
-    <!-- 왼쪽 영역: 아이콘 + 제목 -->
-    <div class="left-container">
-        <div class="card-icon">
-            <img src="{% static 'main/images/data.svg' %}" alt="데이터 관리 아이콘" class="icon-black">
-        </div>
-        <span class="card-title">데이터 관리</span>
-    </div>
-    <!-- 구분선 -->
-    <div class="divider">|</div>
-    <!-- 오른쪽 영역: 부제목 -->
-    <div class="right-container">
-        <span class="card-subtitle">실제 도서 정보 데이터베이스로 관리</span>
-    </div>
-</div>
-<div class="info-card">
-    <!-- 왼쪽 영역: 아이콘 + 제목 -->
-    <div class="left-container">
-        <div class="card-icon">
-            <img src="{% static 'main/images/search.svg' %}" alt="도서 이용 예측 아이콘" class="icon-black">
-        </div>
-        <span class="card-title">도서 이용 예측</span>
-    </div>
-    <!-- 구분선 -->
-    <div class="divider">|</div>
-    <!-- 오른쪽 영역: 부제목 -->
-    <div class="right-container">
-        <span class="card-subtitle">머신러닝을 활용한 도서 수요 예측</span>
     </div>
 </div>
 {% endblock content %}

@@ -21,4 +21,9 @@ document.addEventListener('DOMContentLoaded', function () {
     menuIcons.forEach(icon => {
         icon.addEventListener('click', openSidebar); // 클릭 시 열림
     });
+
+    // 디버깅 로그 추가
+    console.log('Sidebar initialized:', sidebar);
+    console.log('Toggle button initialized:', toggleBtn);
+    console.log('Menu icons initialized:', menuIcons);
 });
