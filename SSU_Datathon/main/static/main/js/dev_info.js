@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
     // UI 요소 선택
     const tabs = document.querySelectorAll(".content-tab");
-    const chartContainer = document.querySelector(".content-box");
     const dev = document.getElementById("dev-info");
     const copy = document.getElementById("copy-info");
+    const license = document.getElementById("license-info");
     let selectedTab = "개발자 정보"; // 기본 선택 탭
 
     // **탭 클릭 이벤트 - 이미지 변경 및 초기화**
@@ -20,9 +20,15 @@ document.addEventListener("DOMContentLoaded", function () {
             if (selectedTab === "개발자 정보") {
                 dev.style.display = "block";
                 copy.style.display = "none";
-            } else {
+                license.style.display = "none";
+            } else if (selectedTab === "저작권 정보"){
                 dev.style.display = "none";
                 copy.style.display = "block";
+                license.style.display = "none";
+            } else {
+                dev.style.display = "none";
+                copy.style.display = "none";
+                license.style.display = "block";
             }
         });
     });
