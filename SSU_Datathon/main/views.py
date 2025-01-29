@@ -8,6 +8,7 @@ from django.views.decorators.cache import never_cache
 from django.db import connection
 from datetime import datetime
 import pandas as pd
+import math
 import json
 from .models import Book
 from django.db.models import Q
@@ -37,11 +38,13 @@ def DB_login(request):
 
     # 데이터베이스에서 B1 및 4F 데이터를 가져옵니다.
     with connection.cursor() as cursor:
-        cursor.execute("SELECT count(*) FROM book WHERE location = '4층인문'")
-        f4_count = cursor.fetchone()[0]
+        cursor.execute("SELECT * FROM large_classification WHERE TAG = '4층인문'")
+        raw_data = cursor.fetchall()[0]
+        f4_count = sum(raw_data[1:])
 
-        cursor.execute("SELECT count(*) FROM book WHERE location = '보존서고'")
-        b1_count = cursor.fetchone()[0]
+        cursor.execute("SELECT * FROM large_classification WHERE TAG = '보존서고'")
+        raw_data = cursor.fetchall()[0]
+        b1_count = sum(raw_data[1:])
 
         cursor.execute("SELECT * FROM large_classification WHERE TAG = '전체'")
         raw_data = cursor.fetchall()[0]
@@ -99,6 +102,10 @@ def ratio_setting(request):
     return render(request, 'main/predict/ratio_predict.html')
 
 @login_required(login_url='DB_login')
+def dev_info(request):
+    return render(request, 'main/dev_info.html')
+
+@login_required(login_url='DB_login')
 def load_book_info(request):
     if request.method == "POST":
         try:
@@ -132,121 +139,120 @@ def load_book_info(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
-# utils.py 혹은 views.py 등에서 사용
-CHOSEONG_LIST = [
-    'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ',
-    'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
-    'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ',
-    'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
-]
-JUNGSEONG_LIST = [
-    'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ',
-    'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ',
-    'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ',
-    'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ',
-    'ㅣ'
-]
-JONGSEONG_LIST = [
-    '',  # 종성 없는 경우
-    'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ',
-    'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ',
-    'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ',
-    'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ',
-    'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ',
-    'ㅍ', 'ㅎ'
-]
+@login_required(login_url='DB_login')
+def download_book_data(request):
+    if request.method == "POST":
+        try: 
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT ID, registration_year, get_course, DDC, ISBN, title, author, publisher, publication_year, location FROM book")
+                book_data = cursor.fetchall()
 
-def decompose_korean_to_jamo(text: str) -> str:
-    """
-    주어진 문자열에서 한글 문자를 초성/중성/종성으로 분해하여
-    모두 이어붙인 문자열을 반환한다. (예: '사과' -> 'ㅅㅏㄱㅗㅏ')
-    """
-    result = []
-    for char in text:
-        # 한글 범위(가 ~ 힣) 확인
-        if '가' <= char <= '힣':
-            code_point = ord(char) - ord('가')
-            chosung_index = code_point // (21 * 28)
-            jungseong_index = (code_point // 28) % 21
-            jongseong_index = code_point % 28
-
-            # 초성 / 중성 / 종성이 존재하면 각각 추가
-            result.append(CHOSEONG_LIST[chosung_index])
-            result.append(JUNGSEONG_LIST[jungseong_index])
-            if jongseong_index != 0:  # 종성이 있으면
-                result.append(JONGSEONG_LIST[jongseong_index])
-        else:
-            # 한글이 아닌 경우도 그대로 추가하거나,
-            # 필요하다면 예외 처리
-            result.append(char)
-    return "".join(result)
-
-def autocomplete(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            query = data.get('query', '').strip()
-
-            if not query:
-                return JsonResponse({'suggestions': []}, status=200)
-
-            # 1) 사용자가 입력한 문자열 자모 분해
-            query_jamo = decompose_korean_to_jamo(query)
-
-            # 2) DB에서 Book 전부 가져오거나(데모용),
-            #    혹은 어느 정도 필터링(Q로 title__icontains=query) 한 뒤 가져오기
-            books = Book.objects.all()  
-            # books = Book.objects.filter(Q(title__icontains=query) | Q(author__icontains=query))
-
-            suggestions = []
-            for book in books:
-                # 책 제목 자모 분해
-                title_jamo = decompose_korean_to_jamo(book.title)
-
-                # 3) 부분 문자열 검사 (query_jamo in title_jamo)
-                if query_jamo in title_jamo:
-                    suggestions.append(book.title)
-
-            # 최대 5개만 반환
-            suggestions = suggestions[:5]
-
-            return JsonResponse({'suggestions': suggestions}, status=200)
-
+            keys = ["도서ID", "등록일자", "수서방법", "분류코드", "ISBN",
+                "서명", "저자", "출판사", "출판연도", "소장위치"]
+            transformed_data = [dict(zip(keys, row)) for row in book_data]
+            return JsonResponse({'success': True, 'data': transformed_data})
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-def book_search(request):
-    if request.method == 'POST':
+@login_required(login_url='DB_login')
+def load_book_data(request):
+    if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            query = data.get('query', '').strip()
-
-            if not query:
-                return JsonResponse({'results': []}, status=200)
-
-            query_jamo = decompose_korean_to_jamo(query)
-            books = Book.objects.all()
-            matched_books = []
-
-            for book in books:
-                title_jamo = decompose_korean_to_jamo(book.title)
-                author_jamo = decompose_korean_to_jamo(book.author)
-
-                # 제목 혹은 저자 자모 분해에서 부분 일치 시
-                if query_jamo in title_jamo or query_jamo in author_jamo:
-                    matched_books.append({
-                        'id': book.id,
-                        'title': book.title,
-                        'author': book.author,
-                        'publisher': book.publisher,
-                        'publication_year': book.publication_year
-                    })
-
-            return JsonResponse({'results': matched_books}, status=200)
-
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            page = int(data.get('page', 1))  # 선택된 데이터 가져오기
+            pageSize = int(data.get('pageSize', 25))
+            start = (page - 1) * pageSize
+            #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT ID, registration_year, get_course, DDC, ISBN, title, author, publisher, publication_year, location FROM book LIMIT {pageSize} OFFSET {start}")
+                book_data = cursor.fetchall()
+            print(len(book_data))
+            return JsonResponse({'success': True, 'data': book_data})
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+@login_required(login_url='DB_login')
+def load_book_max_page_len(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)  # 요청 데이터 파싱
+            pageSize = int(body.get("pageSize", 25))
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '전체'")
+                book_data = cursor.fetchall()[0]
+            total_count = sum(book_data[1:])
+            return JsonResponse({'success': True, 'data': math.ceil(total_count / pageSize)})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def save_add_book(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            print(body)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+
+################################################################
+### 대출 정보 ####
+################################################################
+@login_required(login_url='DB_login')
+def download_rent_data(request):
+    if request.method == "POST":
+        try: 
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT ID, rent_date FROM rent")
+                book_data = cursor.fetchall()
+
+            keys = ["도서ID", "대출일시"]
+            transformed_data = [dict(zip(keys, row)) for row in book_data]
+            print(transformed_data)
+            return JsonResponse({'success': True, 'data': transformed_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def load_rent_data(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            page = int(data.get('page', 1))  # 선택된 데이터 가져오기
+            pageSize = int(data.get('pageSize', 25))
+            order = int(data.get('order', 1))
+            if order == 1:
+                order_by = "DESC"
+            else:
+                order_by = "ASC"
+            start = (page - 1) * pageSize
+            #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT rent_date, ID, title, author, publisher, DDC, location FROM rent NATURAL JOIN book WHERE book.id = rent.id ORDER BY ID {order_by} LIMIT {pageSize} OFFSET {start}")
+                rent_data = cursor.fetchall()
+            print(rent_data)
+            return JsonResponse({'success': True, 'data': rent_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def load_rent_max_page_len(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)  # 요청 데이터 파싱
+            pageSize = int(body.get("pageSize", 25))
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM year_month_count")
+                rent_data = cursor.fetchall()
+                total_sum = sum(sum(year_data[1:]) for year_data in rent_data)
+
+            return JsonResponse({'success': True, 'data': math.ceil(total_sum / pageSize)})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
