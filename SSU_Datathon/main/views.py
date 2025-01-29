@@ -140,6 +140,9 @@ def load_book_info(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
+##############################################################
+########################## 도서 정보 ##########################
+###############################################################
 @login_required(login_url='DB_login')
 def download_book_data(request):
     if request.method == "POST":
@@ -166,7 +169,7 @@ def load_book_data(request):
             start = (page - 1) * pageSize
             #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
             with connection.cursor() as cursor:
-                cursor.execute(f"SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location FROM book LIMIT {pageSize} OFFSET {start}")
+                cursor.execute(f"SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location, `except` FROM book LIMIT {pageSize} OFFSET {start}")
                 book_data = cursor.fetchall()
             return JsonResponse({'success': True, 'data': book_data})
         except Exception as e:
@@ -429,9 +432,9 @@ def edit_book(request):
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
-################################################################
-### 대출 정보 ####
-################################################################
+##############################################################
+########################## 대출 정보 ##########################
+###############################################################
 @login_required(login_url='DB_login')
 def download_rent_data(request):
     if request.method == "POST":
@@ -483,6 +486,107 @@ def load_rent_max_page_len(request):
                 total_sum = sum(sum(year_data[1:]) for year_data in rent_data)
 
             return JsonResponse({'success': True, 'data': math.ceil(total_sum / pageSize)})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+##############################################################
+########################## 예외 도서 정보 ##########################
+###############################################################
+@login_required(login_url='DB_login')
+def except_download_book_data(request):
+    if request.method == "POST":
+        try: 
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location FROM book WHERE `except` = '1'")
+                book_data = cursor.fetchall()
+
+            keys = ["도서ID", "등록일자", "수서방법", "분류코드", "ISBN",
+                "서명", "저자", "출판사", "출판연도", "소장위치"]
+            transformed_data = [dict(zip(keys, row)) for row in book_data]
+            return JsonResponse({'success': True, 'data': transformed_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def except_load_book_data(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            page = int(data.get('page', 1))  # 선택된 데이터 가져오기
+            pageSize = int(data.get('pageSize', 25))
+            start = (page - 1) * pageSize
+            #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location, `except` FROM book WHERE `except` = '1' LIMIT {pageSize} OFFSET {start}")
+                book_data = cursor.fetchall()
+            return JsonResponse({'success': True, 'data': book_data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def except_load_book_max_page_len(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)  # 요청 데이터 파싱
+            pageSize = int(body.get("pageSize", 25))
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT count(*) FROM book WHERE `except` = '1'")
+                book_data = cursor.fetchone()[0]
+            print(book_data)
+            return JsonResponse({'success': True, 'data': math.ceil(book_data / pageSize)})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def save_except_book_file(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            col_mapping = {col: ord(col) - ord('A') for col in body['cols']}
+            df_columns = ["ID"]
+            df_data = []
+            for row in body['rows']:
+                df_row = [row[col_mapping[col]] for col in body['cols']]
+                df_data.append(df_row)
+            df = pd.DataFrame(df_data, columns=df_columns)
+
+
+            df['validation'] = df['ID'].apply(lambda x: "문제없음" if re.match(r'^SS_\d{6}$', x) else "도서ID는 'SS_'로 시작하고 6개의 숫자로 구성되어야 합니다.")
+
+            invalid_rows = df[df['validation'] != "문제없음"]
+
+            if invalid_rows.empty:
+                try:
+                    with connection.cursor() as cursor:
+                        insert_query = """
+                            UPDATE book SET `except` = '1' WHERE ID = %s
+                        """
+                        data_tuples = [
+                            (
+                                row["ID"]
+                            )
+                            for _, row in df.iterrows()
+                        ]
+                        cursor.executemany(insert_query, data_tuples)
+                    connection.commit()
+                    return JsonResponse({'success': True})
+                except Exception as e:
+                    connection.rollback()  # 오류 발생 시 롤백
+                    print(f"Error: {e}")
+                    if e.args[0] == 1062:  # MySQL 에러 코드 1062 (Duplicate entry)
+                        duplicate_id = e.args[1].split("'")[1]  # "SS_000001" 추출
+                        return JsonResponse({'success': False, 'message': f"'{duplicate_id}'은 이미 존재하는 도서ID입니다."}, status=400)
+                    return JsonResponse({'success': False, 'message': f"알 수 없는 오류: {str(e)}"}, status=500)
+            else:
+                first_invalid_row = invalid_rows.iloc[0]  # 첫 번째 행 가져오기
+                first_invalid_id = first_invalid_row["ID"]  # ID 컬럼 값
+                first_invalid_validation = first_invalid_row["validation"]  # validation 컬럼 값
+                text = f'{first_invalid_id}의 {first_invalid_validation} \n다시 확인해 주세요.'
+                return JsonResponse({'success': False, 'message': text}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)

@@ -25,4 +25,8 @@ urlpatterns = [
     path('download_rent_data/', views.download_rent_data, name='download_rent_data'),
     path('load_rent_data/', views.load_rent_data, name='load_rent_data'),
     path('load_rent_max_page_len/', views.load_rent_max_page_len, name='load_rent_max_page_len'),
+    path('except_download_book_data/', views.except_download_book_data, name='except_download_book_data'),
+    path('except_load_book_data/', views.except_load_book_data, name='except_load_book_data'),
+    path('except_load_book_max_page_len/', views.except_load_book_max_page_len, name='except_load_book_max_page_len'),
+    path('save_except_book_file/', views.save_except_book_file, name='save_except_book_file'),
 ]
