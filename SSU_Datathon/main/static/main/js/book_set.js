@@ -789,7 +789,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         editBookPublisher.value = bookData[7] || "";
         editBookPubYear.value = bookData[8] || "";
         editBookLocation.value = bookData[9] || "";
-        editOptionExcept.checked = bookData[10] || false;
+        const isExcept = (bookData[10] === '1');
+        editOptionExcept.checked = isExcept;
 
         // 도서ID 수정 불가
         editBookIdInput.readOnly = true;
