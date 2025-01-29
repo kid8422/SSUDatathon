@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentPage = 1;
     let pageSize = 25;   // 기본값
     let maxPages = 5; // 기본값 (임시 1)
+    let importRows = null;
 
     try {
         // 초기 pageSize=25에 대한 최대 페이지 수 로딩
@@ -164,7 +165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========== 1) 테이블 헤더 (동적) ==========
     function createTableHeader() {
         /* 예시: 열 이름 (문자열 배열) */
-        const headers = ["ID","출판연도","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","소장위치","수정"];
+        const headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","소장위치","수정"];
         
         // 한 줄(헤더 행) 생성
         const tr = document.createElement("tr");
@@ -233,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             editBtn.classList.add("edit-btn");
             editBtn.textContent = "수정";
             editBtn.addEventListener("click", () => {
-                alert("수정 기능 (추후 구현) : ID="+row[0]);
+                openEditBookModal(row)
             });
             lastTd.appendChild(editBtn);
             tr.appendChild(lastTd);
@@ -320,25 +321,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 파일 초기화 함수
     function resetFileUpload() {
-      fileInput.value = "";  // 파일 선택 해제
-      // 초기 표시 문구로 되돌림
-      fileText.textContent = "파일 업로드 (*.csv, *.xls, *.xlsx)";
-      fileLabel.style.background = "#FFFFFF"; // 초기 흰색 배경
-      // 드롭다운도 초기화
-      allSelects.forEach(select => {
-        select.innerHTML = '<option value="">먼저 파일을 선택하세요</option>';
-    });
+        fileInput.value = "";  // 파일 선택 해제
+        // 초기 표시 문구로 되돌림
+        fileText.textContent = "파일 업로드 (*.csv, *.xls, *.xlsx)";
+        fileLabel.style.background = "#FFFFFF"; // 초기 흰색 배경
+        // 드롭다운도 초기화
+        allSelects.forEach(select => {
+            select.innerHTML = '<option value="">먼저 파일을 선택하세요</option>';
+        });
     }
   
     // 가져오기 버튼: 모달 열기
     importBtn.addEventListener('click', () => {
-      importModal.classList.add('show');
+        importModal.classList.add('show');
     });
   
     // 닫기(X) 버튼: 모달 닫고 파일 상태 초기화
     importModalClose.addEventListener('click', () => {
-      importModal.classList.remove('show');
-      resetFileUpload();
+        importModal.classList.remove('show');
+        resetFileUpload();
     });
   
     // 가져오기 모달 내 저장/취소 버튼
@@ -347,35 +348,91 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     // 취소 버튼: 모달 닫고 파일 상태 초기화
     cancelBtnInImport.addEventListener('click', () => {
-      importModal.classList.remove('show');
-      resetFileUpload();
+        importModal.classList.remove('show');
+        resetFileUpload();
     });
+
     // saveBtnInImport 클릭 시 => 로직 추가 (ex: Ajax)
-  
+    saveBtnInImport.addEventListener('click', async function () {
+        // 1) importRows가 존재하는지 확인
+        if (!importRows) {
+            alert("파일이 제대로 로드되지 않았습니다. 다시 시도하세요.");
+            return;
+        }
+
+        // 2) 각 <select>에서 선택된 값(열 정보) 가져오기
+        //    allSelects는 기존 코드에서 querySelectorAll('.column-select')로 얻은 배열
+        const selectedCols = [];
+        for (const selectElem of allSelects) {
+            const val = selectElem.value.trim();
+            if (!val) {
+                alert("모든 컬럼을 선택해야 합니다!");
+                return;
+            }
+            // 중복 검사
+            if (selectedCols.includes(val)) {
+                alert("각 컬럼은 중복 선택할 수 없습니다.");
+                return;
+            }
+            selectedCols.push(val);
+        }
+
+        const requestData = {
+            rows: importRows,
+            cols: selectedCols
+        };
+
+        try {
+            // 4) fetch 전송 (URL은 예시 "/importData"로 가정)
+            const response = await fetch(SAVEBOOKFILE, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify(requestData)
+                });
+            const result = await response.json();
+            
+            if (result.success) {
+                alert("데이터 가져오기 성공");
+                // 모달 닫기 or 추가 로직
+                updateMaxPageAndReload();
+                importModal.classList.remove('show');
+                resetFileUpload();
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error("가져오기 요청 중 오류:", error);
+            alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+    });
+
     // 파일이 선택(또는 변경)될 때
     fileInput.addEventListener('change', handleFile);
   
     /* ========== (1) 파일 읽고 SheetJS로 파싱 ========== */
     function handleFile(evt) {
-      const file = evt.target.files[0];
-      if (!file) return;
-  
-      // 확장자 검사(추가 안전장치)
-      const allowed = ['csv', 'xls', 'xlsx'];
-      const ext = file.name.split('.').pop().toLowerCase();
-      if (!allowed.includes(ext)) {
-        alert('허용되지 않는 파일 형식입니다.');
-        fileInput.value = '';
-        return;
-      }
-  
-      // 라벨 배경색을 회색
-      fileLabel.style.background = '#DDDDDD';
-      fileText.textContent = file.name; // 선택한 파일명 표시
-  
-      // FileReader를 이용하여 파일 읽기 (ArrayBuffer)
-      const reader = new FileReader();
-      reader.onload = function(e) {
+        const file = evt.target.files[0];
+        if (!file) return;
+    
+        // 확장자 검사(추가 안전장치)
+        const allowed = ['csv', 'xls', 'xlsx'];
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowed.includes(ext)) {
+            alert('허용되지 않는 파일 형식입니다.');
+            fileInput.value = '';
+            return;
+        }
+    
+        // 라벨 배경색을 회색
+        fileLabel.style.background = '#DDDDDD';
+        fileText.textContent = file.name; // 선택한 파일명 표시
+    
+        // FileReader를 이용하여 파일 읽기 (ArrayBuffer)
+        const reader = new FileReader();
+        reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
   
         // SheetJS로 workbook 생성
@@ -390,11 +447,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   
         // rows[0] 는 첫 번째 행(배열). => 열 수
         if (rows.length > 0) {
-          const firstRow = rows[0];
-          const colCount = firstRow.length;
+            importRows = rows;
+            const firstRow = rows[0];
+            const colCount = firstRow.length;
   
-          // (2) 드롭다운 생성
-          createColumnOptions(colCount);
+            // (2) 드롭다운 생성
+            createColumnOptions(colCount);
         }
       };
   
@@ -520,6 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bookPublisher = document.getElementById("bookPublisher");
     const bookPubYear = document.getElementById("bookPubYear");
     const bookLocation = document.getElementById("bookLocation");
+    const checkbox = document.getElementById("option-except");
 
     function closeAndClearAddBookModal() {
         addBookModal.classList.remove('show');
@@ -534,22 +593,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         bookPublisher.value = "";
         bookPubYear.value = "";
         bookLocation.value = ""; // ""(선택하세요)
+        checkbox.checked = false;
       }
     
     addBookBtn.addEventListener('click', () => {
-      addBookModal.classList.add('show');
+        addBookModal.classList.add('show');
     });
 
     addBookModalClose.addEventListener('click', () => {
-      addBookModal.classList.remove('show');
-      closeAndClearAddBookModal()
+          addBookModal.classList.remove('show');
+        closeAndClearAddBookModal()
     });
   
     const saveBtnInAddBook = addBookModal.querySelector('.save-btn');
     const cancelBtnInAddBook = addBookModal.querySelector('.cancel-btn');
     cancelBtnInAddBook.addEventListener('click', () => {
-      addBookModal.classList.remove('show');
-      closeAndClearAddBookModal()
+        addBookModal.classList.remove('show');
+        closeAndClearAddBookModal()
     });
     
     saveBtnInAddBook.addEventListener('click', async () => {
@@ -564,6 +624,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const publisher = bookPublisher.value.trim();
         const pubYear = bookPubYear.value.trim();
         const location = bookLocation.value; // select => 빈문자(선택) or 실제 값
+        const checkbox = document.getElementById("option-except");
     
         // 2) 필수 항목 검증
         if (!bookId || !regDate || !getMethod || !ddc || !isbn || !title || !author || !publisher || !pubYear) {
@@ -576,22 +637,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     
         // 3) 서버로 전송할 데이터 구성
+        const checked = checkbox.checked
         const requestData = {
-          bookId,       // bookId: bookId, 
-          regDate,
-          getMethod,
-          ddc,
-          isbn,
-          title,
-          author,
-          publisher,
-          pubYear,
-          location
+            bookId,       // bookId: bookId, 
+            regDate,
+            getMethod,
+            ddc,
+            isbn,
+            title,
+            author,
+            publisher,
+            pubYear,
+            location,
+            checked
         };
     
         try {
           // 4) fetch -> POST 전송
-          console.log(requestData);
           const response = await fetch(SAVEADDBOOK, {
             method: "POST",
             headers: {
@@ -605,17 +667,138 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (result.success) {
             alert("도서 정보가 성공적으로 저장되었습니다.");
             // 모달 닫고 값 초기화
+            updateMaxPageAndReload();
             closeAndClearAddBookModal();
           } else {
-            alert("저장에 실패했습니다. 관리자에게 문의하세요.");
+            alert(result.message);
           }
         } catch (error) {
           console.error("저장 요청 중 오류 발생:", error);
           alert("오류가 발생했습니다. 다시 시도하세요.");
         }
       });
-  
-  });
+
+    /* ================================
+     도서수정 (EditBook)
+    ================================ */
+    const editBookModal = document.getElementById("editBookModal");
+    const editBookModalClose = document.getElementById("editBookModalClose");
+    const editBookSaveBtn = document.getElementById("editBookSaveBtn");
+    const editBookCancelBtn = document.getElementById("editBookCancelBtn");
+
+    // 수정 모달의 각 필드
+    const editBookIdInput = document.getElementById("editBookIdInput");
+    const editBookRegDate = document.getElementById("editBookRegDate");
+    const editBookGetMethod = document.getElementById("editBookGetMethod");
+    const editBookDDC = document.getElementById("editBookDDC");
+    const editBookISBN = document.getElementById("editBookISBN");
+    const editBookTitle = document.getElementById("editBookTitle");
+    const editBookAuthor = document.getElementById("editBookAuthor");
+    const editBookPublisher = document.getElementById("editBookPublisher");
+    const editBookPubYear = document.getElementById("editBookPubYear");
+    const editBookLocation = document.getElementById("editBookLocation");
+    const editOptionExcept = document.getElementById("edit-option-except");
+
+    function closeAndClearEditBookModal() {
+        editBookModal.classList.remove('show');
+        editBookIdInput.value = "";
+        editBookRegDate.value = "";
+        editBookGetMethod.value = "";
+        editBookDDC.value = "";
+        editBookISBN.value = "";
+        editBookTitle.value = "";
+        editBookAuthor.value = "";
+        editBookPublisher.value = "";
+        editBookPubYear.value = "";
+        editBookLocation.value = ""; 
+        editOptionExcept.checked = false;
+    }
+
+    // (1) X 버튼
+    editBookModalClose.addEventListener('click', closeAndClearEditBookModal);
+    // (2) 취소 버튼
+    editBookCancelBtn.addEventListener('click', closeAndClearEditBookModal);
+
+    // (3) 확인(저장) 버튼
+    editBookSaveBtn.addEventListener('click', async () => {
+        // 유효성 검사
+        const bookId = editBookIdInput.value.trim();
+        const regDate = editBookRegDate.value.trim();
+        const getMethod = editBookGetMethod.value.trim();
+        const ddc = editBookDDC.value.trim();
+        const isbn = editBookISBN.value.trim();
+        const title = editBookTitle.value.trim();
+        const author = editBookAuthor.value.trim();
+        const publisher = editBookPublisher.value.trim();
+        const pubYear = editBookPubYear.value.trim();
+        const location = editBookLocation.value;
+        const checked = editOptionExcept.checked;
+
+        if (!bookId || !regDate || !getMethod || !ddc || !isbn || !title || !author || !publisher || !pubYear) {
+            alert("필수 항목을 모두 입력하세요!");
+            return;
+        }
+        if (!["4층인문", "보존서고"].includes(location)) {
+            alert("소장 위치를 선택하세요!");
+            return;
+        }
+
+        // 서버에 전송할 데이터
+        const requestData = {
+            bookId, regDate, getMethod, ddc, isbn, title, author,
+            publisher, pubYear, location, checked
+        };
+
+        try {
+            const response = await fetch(EDITBOOK, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify(requestData)
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert("도서 정보가 성공적으로 수정되었습니다.");
+                // 테이블 리로드 etc...
+                updateMaxPageAndReload();
+                closeAndClearEditBookModal();
+            } else {
+                alert(result.message || "수정 실패");
+            }
+        } catch (error) {
+            console.error("수정 요청 오류:", error);
+            alert("오류가 발생했습니다.");
+        }
+    });
+
+    // (4) 열기 함수: 도서 정보로 필드 채우기 + 모달 열기
+    function openEditBookModal(bookData) {
+        // bookData 예: {
+        //   id: "SS_000012", regDate: "2023-01-01", ...
+        // }
+        console.log(bookData);
+        editBookIdInput.value = bookData[0] || "";
+        editBookRegDate.value = bookData[1] || "";
+        editBookGetMethod.value = bookData[2] || "";
+        editBookDDC.value = bookData[3] || "";
+        editBookISBN.value = bookData[4] || "";
+        editBookTitle.value = bookData[5] || "";
+        editBookAuthor.value = bookData[6] || "";
+        editBookPublisher.value = bookData[7] || "";
+        editBookPubYear.value = bookData[8] || "";
+        editBookLocation.value = bookData[9] || "";
+        editOptionExcept.checked = bookData[10] || false;
+
+        // 도서ID 수정 불가
+        editBookIdInput.readOnly = true;
+
+        // 모달 열기
+        editBookModal.classList.add('show');
+    }
+    
+});
 
 
 
@@ -634,9 +817,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 }
 
 function getFormattedDate() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 +1
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`; // YYYY-MM-DD 형식
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 +1
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // YYYY-MM-DD 형식
 }
