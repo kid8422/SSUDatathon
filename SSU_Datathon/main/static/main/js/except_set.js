@@ -245,8 +245,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 수정 버튼
             const lastTd = document.createElement("td");
             const editBtn = document.createElement("button");
+
+            // 수정하기 아이콘
+            const editIconWrapper = document.createElement("div");
+            editIconWrapper.classList.add("option-img");
+
+            const editIcon = document.createElement("img");
+            editIcon.src = WRENCH; // 이미지 경로
+            editIcon.alt = "수정";  // 대체 텍스트
+            editIcon.classList.add("option-icon");
+
+            editIconWrapper.appendChild(editIcon);
+
+            // 수정하기 텍스트
+            const editTextWrapper = document.createElement("div");
+            editTextWrapper.classList.add("edit-text");
+
+            const editText = document.createElement("div");
+            editText.textContent = "수정";
+            
+            editTextWrapper.appendChild(editText);
+
             editBtn.classList.add("edit-btn");
-            editBtn.textContent = "수정";
+            editBtn.appendChild(editIconWrapper);
+            editBtn.appendChild(editTextWrapper);
+            
             editBtn.addEventListener("click", () => {
                 openEditBookModal(row)
             });
