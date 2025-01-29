@@ -25,6 +25,7 @@
         const F4_PREDICT = "{% url 'f4_predict' %}";
         const B1_PREDICT = "{% url 'b1_predict' %}";
         const RATIO_PREDICT = "{% url 'ratio_predict' %}";
+        const DEVINFO = "{% url 'dev_info' %}";
     </script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
@@ -102,6 +103,9 @@
         </div>
 
         <!-- 로그아웃 버튼 -->
+        <div class="dev-info-btn" onclick="location.href=DEVINFO">
+            <img src="{% static 'main/images/help.svg' %}" alt="개발 정보" />
+        </div>
         <div class="logout-btn" onclick="location.href=LOGOUT">
           <div class="logout-bg"></div>
           <div class="logout-text">Logout</div>

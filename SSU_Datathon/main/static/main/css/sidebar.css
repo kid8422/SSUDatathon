@@ -208,3 +208,24 @@
     font-weight: 700;
     line-height: 32px;
   }
+  
+  /* 개발정보 버튼 */
+  .dev-info-btn {
+  position: absolute;  /* 절대 위치 설정 */
+  bottom: 10px;        /* 아래에서 20px 떨어진 위치 */
+  left: 2px;         /* 오른쪽에서 20px 떨어진 위치 */
+  width: 90px;
+  height: 36px;
+  padding: 8px 16px;   /* 버튼 내부 패딩 (위아래 8px, 좌우 16px) */
+  border-radius: 10px; /* 모서리를 둥글게 */
+  color: white;        /* 텍스트 색상 */
+  font-size: 1rem;     /* 글자 크기 */
+  font-weight: 700;    /* 글자 두께 */
+  text-align: center;  /* 텍스트 중앙 정렬 */
+  
+}
+
+/* 닫힘 상태에서 로그아웃 버튼 숨김 */
+.sidebar.close .dev-info-btn {
+    display: none;
+}
