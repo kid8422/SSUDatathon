@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tr = document.createElement("tr");
 
             // row.length-1 까지 실제 데이터, 마지막 열에 수정 버튼
-            for (let i=0; i<row.length; i++) {
+            for (let i=0; i<row.length - 1; i++) {
                 const td = document.createElement("td");
                 td.textContent = row[i];
                 tr.appendChild(td);
