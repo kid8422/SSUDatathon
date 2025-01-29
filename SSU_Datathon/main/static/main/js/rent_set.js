@@ -156,18 +156,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginationContainer.appendChild(prevBtn);
 
         // 중앙 5개
-        const startPage = Math.max(1, currentPage-2);
-        let endPage = Math.min(maxPages, startPage+4);
-        while ((endPage-startPage) <4 && startPage>1) {
-            endPage++;
-            if(endPage>maxPages) break;
+        const visibleCount = 5;  // 한 번에 표시할 페이지 수
+        let startPage = currentPage - 2;
+        let endPage = currentPage + 2;
+
+        // 왼쪽 경계 처리
+        if (startPage < 1) {
+            // startPage가 1보다 작다면 그만큼 오른쪽으로 밀어서 보정
+            endPage += (1 - startPage);
+            startPage = 1;
         }
-        for(let p=startPage; p<=endPage; p++){
-            const pageBtn = createPageButton(p, ()=> {
+        // 오른쪽 경계 처리
+        if (endPage > maxPages) {
+            // endPage가 maxPages보다 크다면 그만큼 왼쪽으로 밀어서 보정
+            startPage -= (endPage - maxPages);
+            endPage = maxPages;
+            // 보정 후 startPage가 다시 1 이하로 내려갈 수도 있으니 재검사
+            if (startPage < 1) startPage = 1;
+        }
+
+        // 이제 startPage ~ endPage 범위로 페이지 버튼 생성
+        for (let p = startPage; p <= endPage; p++) {
+            const pageBtn = createPageButton(p, () => {
                 currentPage = p;
                 loadTableData();
             });
-            if(p===currentPage) pageBtn.classList.add("active");
+            if (p === currentPage) pageBtn.classList.add("active");
             paginationContainer.appendChild(pageBtn);
         }
 
