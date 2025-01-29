@@ -1,0 +1,69 @@
+<!-- 도움 - 개발자 정보 -->
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'main/css/dev_info.css' %}">
+<script src="{% static 'main/js/dev_info.js' %}"></script>
+{% endblock %}
+
+{% block sidebar_state %}open{% endblock %}
+
+{% block title %}개발 정보{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="tabs">
+                <!-- 대분류/중분류 탭 -->
+                <div class="content-tab active">개발자 정보</div>
+                <div class="content-tab">저작권 정보</div>
+            </div>
+            <!-- 선택된 데이터 없음 -->
+            <div class="table dev" id="dev-info">
+                <div>프로젝트</div>
+                <div>숭실대학교 중앙도서관 서가관리 웹</div>
+                <div class="mb-3"></div>
+                <div>개발년도</div>
+                <div>2024.12.10 ~ 2025.02.04</div>
+                <div class="mb-3"></div>
+                <div>팀명</div>
+                <div>하드코딩</div>
+                <div class="mb-3"></div>
+                <div>팀구성</div>
+                <div>숭실대학교 AI융합학부 20231784 정해찬</div>
+                <div>숭실대학교 AI융합학부 20231771 송종혁</div>
+                <div>숭실대학교 AI융합학부 20233109 장재혁</div>
+                <div class="mb-3"></div>
+                <div>Github</div>
+                <div>https://github.com/kid8422/SSUDatathon.git</div>
+            </div>
+            <div class="table copy" id="copy-info" style="display: none;">
+                <div>MIT License</div>
+                <div class="mb-3"></div>
+                <div>Copyright (c) 2024 haechan8422</div>
+                <div class="mb-3"></div>
+                <div>Permission is hereby granted, free of charge, to any person obtaining a copy</div>
+                <div>of this software and associated documentation files (the "Software"), to deal</div>
+                <div>in the Software without restriction, including without limitation the rights</div>
+                <div>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</div>
+                <div>copies of the Software, and to permit persons to whom the Software is</div>
+                <div>furnished to do so, subject to the following conditions:</div>
+                <div class="mb-3"></div>
+                <div>The above copyright notice and this permission notice shall be included in all</div>
+                <div>copies or substantial portions of the Software.</div>
+                <div class="mb-3"></div>
+                <div>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</div>
+                <div>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</div>
+                <div>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</div>
+                <div>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</div>
+                <div>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</div>
+                <div>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</div>
+                <div>SOFTWARE.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
