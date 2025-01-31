@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadTableData() {
         console.log("Load data -> page:", currentPage, "pageSize:", pageSize);
         try {
-            const res = await fetch(LOADBOOKDATA, {
+            const res = await fetchWithLoading(LOADBOOKDATA, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function load_max_page_len(pageSize) {
         try {
-            const response = await fetch(LOADMAXPAGELEN, {
+            const response = await fetchWithLoading(LOADMAXPAGELEN, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -420,8 +420,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
-            // 4) fetch 전송 (URL은 예시 "/importData"로 가정)
-            const response = await fetch(SAVEBOOKFILE, {
+            // 4) fetchWithLoading 전송 (URL은 예시 "/importData"로 가정)
+            const response = await fetchWithLoading(SAVEBOOKFILE, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     async function downloadBookData() {
       try {
-          const response = await fetch(DOWNLOADBOOK, {
+          const response = await fetchWithLoading(DOWNLOADBOOK, {
               method: "POST",
               headers: {
                   'Content-Type': 'application/json',
@@ -690,8 +690,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     
         try {
-          // 4) fetch -> POST 전송
-          const response = await fetch(SAVEADDBOOK, {
+          // 4) fetchWithLoading -> POST 전송
+          const response = await fetchWithLoading(SAVEADDBOOK, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -787,7 +787,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
-            const response = await fetch(EDITBOOK, {
+            const response = await fetchWithLoading(EDITBOOK, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

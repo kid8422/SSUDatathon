@@ -272,6 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 예: row => ['SS_000001', 1982, 7, ... '수정'은 버튼]
         results.forEach((row) => {
             const tr = document.createElement("tr");
+            row[0] = row[0].replace("T", " ");
 
             // row.length-1 까지 실제 데이터, 마지막 열에 수정 버튼
             for (let i=0; i<row.length; i++) {
@@ -289,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadTableData() {
         console.log("Load data -> page:", currentPage, "pageSize:", pageSize);
         try {
-            const res = await fetch(LOADRENTDATA, {
+            const res = await fetchWithLoading(LOADRENTDATA, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -308,7 +309,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function load_max_page_len(pageSize) {
         try {
-            const response = await fetch(LOADMAXPAGELEN, {
+            const response = await fetchWithLoading(LOADMAXPAGELEN, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -475,7 +476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     async function downloadrentData() {
       try {
-          const response = await fetch(DOWNLOADRENT, {
+          const response = await fetchWithLoading(DOWNLOADRENT, {
               method: "POST",
               headers: {
                   'Content-Type': 'application/json',
