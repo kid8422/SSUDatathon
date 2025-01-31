@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 디버깅 로그 추가
-    console.log('Sidebar initialized:', sidebar);
-    console.log('Toggle button initialized:', toggleBtn);
-    console.log('Menu icons initialized:', menuIcons);
+    //console.log('Sidebar initialized:', sidebar);
+    //console.log('Toggle button initialized:', toggleBtn);
+    //console.log('Menu icons initialized:', menuIcons);
 });
