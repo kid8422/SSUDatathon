@@ -15,6 +15,7 @@ urlpatterns = [
     path('predict_f4/', views.predict_f4, name='f4_predict'),
     path('predict_b1/', views.predict_b1, name='b1_predict'),
     path('ratio_setting/', views.ratio_setting, name='ratio_predict'),
+    path('DB_preprocessing/', views.DB_preprocessing, name='DB_preprocessing'),
     path('load_book_info/', views.load_book_info, name='load_book_info'),
     path('download_book_data/', views.download_book_data, name='download_book_data'),
     path('load_book_data/', views.load_book_data, name='load_book_data'),
@@ -29,4 +30,8 @@ urlpatterns = [
     path('except_load_book_data/', views.except_load_book_data, name='except_load_book_data'),
     path('except_load_book_max_page_len/', views.except_load_book_max_page_len, name='except_load_book_max_page_len'),
     path('save_except_book_file/', views.save_except_book_file, name='save_except_book_file'),
+    path('load_book_info_predict/', views.load_book_info_predict, name='load_book_info_predict'),
+    path('predict_book_f4/', views.predict_book_f4, name='predict_book_f4'),
+    path('load_db_update/', views.load_db_update, name='load_db_update'),
+    path('preprocessing_db/', views.preprocessing_db, name='preprocessing_db'),
 ]

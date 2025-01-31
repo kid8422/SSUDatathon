@@ -6,8 +6,11 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.db import connection
+from pathlib import Path
 from datetime import datetime, timedelta
 import pandas as pd
+import xgboost as xgb
+import os
 import re
 import math
 import json
@@ -101,6 +104,10 @@ def predict_b1(request):
 @login_required(login_url='DB_login')
 def ratio_setting(request):
     return render(request, 'main/predict/ratio_predict.html')
+
+@login_required(login_url='DB_login')
+def DB_preprocessing(request):
+    return render(request, 'main/predict/preprocessing_predict.html')
 
 @login_required(login_url='DB_login')
 def dev_info(request):
@@ -466,9 +473,8 @@ def load_rent_data(request):
             start = (page - 1) * pageSize
             #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
             with connection.cursor() as cursor:
-                cursor.execute(f"SELECT rent_date, ID, title, author, publisher, DDC, location FROM rent NATURAL JOIN book WHERE book.id = rent.id ORDER BY ID {order_by} LIMIT {pageSize} OFFSET {start}")
+                cursor.execute(f"SELECT rent_time, ID, title, author, publisher, DDC, location FROM rent_info ORDER BY rent_time {order_by} LIMIT {pageSize} OFFSET {start}")
                 rent_data = cursor.fetchall()
-            print(rent_data)
             return JsonResponse({'success': True, 'data': rent_data})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
@@ -491,7 +497,7 @@ def load_rent_max_page_len(request):
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
 ##############################################################
-########################## 예외 도서 정보 ##########################
+####################### 예외 도서 정보 ########################
 ###############################################################
 @login_required(login_url='DB_login')
 def except_download_book_data(request):
@@ -587,6 +593,326 @@ def save_except_book_file(request):
                 first_invalid_validation = first_invalid_row["validation"]  # validation 컬럼 값
                 text = f'{first_invalid_id}의 {first_invalid_validation} \n다시 확인해 주세요.'
                 return JsonResponse({'success': False, 'message': text}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+##############################################################
+####################### 4층 인문 예측 #########################
+###############################################################
+
+@login_required(login_url='DB_login')
+def load_book_info_predict(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            
+            location = data.get('location')  # 선택된 데이터 가져오기
+            if location == '3층인문':
+                location = '보존서고'
+
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
+                raw_data = cursor.fetchall()[0]
+        
+            numeric_data = list(raw_data[1:])
+            result_data_json = json.dumps(numeric_data)
+            return JsonResponse({'success': True, 'data': result_data_json})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def predict_book_f4(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            
+            location = data.get('location')  # 선택된 데이터 가져오기
+            quantity = data.get('quantity')
+            year = data.get('year')
+
+
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
+                raw_data = cursor.fetchall()[0]
+        
+            numeric_data = list(raw_data[1:])
+            result_data_json = json.dumps(numeric_data)
+            return JsonResponse({'success': True, 'data': result_data_json})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+##############################################################
+####################### 모델 불러오기 #########################
+###############################################################
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODELPATH = os.path.join(BASE_DIR, 'main', 'static', 'main', 'models')
+
+loaded_models = []
+
+# 폴더 내 모든 파일 탐색
+for filename in os.listdir(MODELPATH):
+    # 모델 파일이라고 가정할 확장자를 체크하거나, 필요한 경우 필터링할 수 있음
+    if filename.endswith(".json"):
+        file_path = os.path.join(MODELPATH, filename)
+        
+        # XGBoost scikit-learn 래퍼 객체를 생성
+        model = xgb.XGBRegressor()
+
+        # 모델 불러오기
+        model.load_model(file_path)
+        
+        # 리스트에 저장
+        loaded_models.append(model)
+
+# 예측 함수
+def predict_term_year_model(input_data, year):
+    # 각 모델로부터 예측
+    pred_model = []
+    for i in range(len(loaded_models)):
+        pred_model.append(loaded_models[i].predict(input_data))
+
+    w = [0 for _ in range(5)]
+    if year % 5 == 4: # 2004
+        w[0], w[1], w[2], w[3], w[4] = 0.7, 0.1, 0.05, 0.05, 0.1
+    elif year % 5 == 0: # 2005
+        w[0], w[1], w[2], w[3], w[4] = 0.1, 0.7, 0.1, 0.05, 0.05
+    elif year % 5 == 1: # 2006
+        w[0], w[1], w[2], w[3], w[4] = 0.05, 0.1, 0.7, 0.1, 0.05
+    elif year % 5 == 2: # 2007
+        w[0], w[1], w[2], w[3], w[4] = 0.05, 0.05, 0.1, 0.7, 0.1
+    else:
+        w[0], w[1], w[2], w[3], w[4] = 0.1, 0.05, 0.05, 0.1, 0.7
+        
+    # 가중 평균
+    ensemble_pred = sum([pred_model[i] * w[i] for i in range(5)])
+    return ensemble_pred
+
+##############################################################
+####################### 데이터 전처리 #########################
+###############################################################
+
+@login_required(login_url='DB_login')
+def load_db_update(request):
+    if request.method == "POST":
+        try:
+            db = ["book", "rent", "large_classification", "middle_classification", 
+                  "rent_count", "year_month_count", "year_month_count_detail", 
+                  "ISBN_rent_count", "None_ISBN_rent_count","recent_rent", ]
+            data = {}
+
+            with connection.cursor() as cursor:
+                for table in db:
+                    cursor.execute(f"SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = 'hardcoding' AND TABLE_NAME = '{table}'")
+                    raw_data = cursor.fetchall()[0]
+                    if raw_data[0] == None:
+                        d = "변동 내역 없음"
+                    else:
+                        d = raw_data[0].strftime("%Y년 %m월 %d일 %H시 %M분 %S초").replace(" 0", " ")
+                    data[table] = d
+            
+            print(data)
+            return JsonResponse({'success': True, 'data': data})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def preprocessing_db(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            
+            option = data.get('data')  # 선택된 데이터 가져오기
+
+            error = []
+
+            if 'ISBN 제공 도서 대여 정보' in option:
+                try: 
+                    with connection.cursor() as cursor:
+                        cursor.execute("SELECT ID, rent_date, ISBN FROM rent NATURAL JOIN book WHERE rent.ID = book.ID")
+                        raw_data = cursor.fetchall()
+
+                        ISBN_df = pd.DataFrame(raw_data, columns=['ID', 'rent_date', 'ISBN'])
+                        ISBN_df['rent_year'] = pd.to_datetime(ISBN_df['rent_date']).dt.year
+                        ISBN_df = ISBN_df[ISBN_df['ISBN'] != '0']
+
+                        result_df = ISBN_df.groupby('ISBN').agg(
+                            도서ID개수=('ID', lambda x: x.nunique()),  # 고유 도서 ID 개수
+                        ).reset_index()
+
+                        years = list(range(2004, 2025))
+                        for year in years:
+                            result_df[year] = 0  # 기본값 0 설정
+                        year_counts = ISBN_df.groupby(['ISBN', 'rent_year']).size().unstack(fill_value=0)
+
+                        for year in years:
+                            if year in year_counts.columns:
+                                result_df[year] = result_df['ISBN'].map(year_counts[year])
+                        result_df = result_df.astype(object)
+                except Exception as e:
+                    error.append(str(e))
+
+                try:
+                    with connection.cursor() as cursor:
+                        insert_query = """
+                            INSERT INTO ISBN_rent_count 
+                            (ISBN, ID_count, `2004`, `2005`, `2006`, `2007`, `2008`, `2009`, `2010`, `2011`, `2012`, `2013`, 
+                            `2014`, `2015`, `2016`, `2017`, `2018`, `2019`, `2020`, `2021`, `2022`, `2023`, `2024`) 
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE 
+                            ID_count = VALUES(ID_count),
+                            `2004` = VALUES(`2004`), `2005` = VALUES(`2005`), `2006` = VALUES(`2006`), 
+                            `2007` = VALUES(`2007`), `2008` = VALUES(`2008`), `2009` = VALUES(`2009`), 
+                            `2010` = VALUES(`2010`), `2011` = VALUES(`2011`), `2012` = VALUES(`2012`), 
+                            `2013` = VALUES(`2013`), `2014` = VALUES(`2014`), `2015` = VALUES(`2015`), 
+                            `2016` = VALUES(`2016`), `2017` = VALUES(`2017`), `2018` = VALUES(`2018`), 
+                            `2019` = VALUES(`2019`), `2020` = VALUES(`2020`), `2021` = VALUES(`2021`), 
+                            `2022` = VALUES(`2022`), `2023` = VALUES(`2023`), `2024` = VALUES(`2024`)
+                        """
+                        data_tuples = [
+                            (
+                                result_df.iloc[i, 0], result_df.iloc[i, 1], result_df.iloc[i, 2], result_df.iloc[i, 3], result_df.iloc[i, 4], result_df.iloc[i, 5], 
+                                result_df.iloc[i, 6], result_df.iloc[i, 7], result_df.iloc[i, 8], result_df.iloc[i, 9], result_df.iloc[i, 10], result_df.iloc[i, 11], 
+                                result_df.iloc[i, 12], result_df.iloc[i, 13], result_df.iloc[i, 14], result_df.iloc[i, 15], result_df.iloc[i, 16], result_df.iloc[i, 17], 
+                                result_df.iloc[i, 18], result_df.iloc[i, 19], result_df.iloc[i, 20], result_df.iloc[i, 21], result_df.iloc[i, 22]
+                            )
+                            for i in range(len(result_df))
+                        ]
+                        cursor.executemany(insert_query, data_tuples)
+                    connection.commit()
+                except Exception as e:
+                    connection.rollback()  # 오류 발생 시 롤백
+                    error.append(str(e))
+
+
+            if 'ISBN 미제공 도서 대여 정보' in option:
+                try: 
+                    with connection.cursor() as cursor:
+                        cursor.execute("SELECT ID, rent_date, ISBN, title, author, publisher FROM rent NATURAL JOIN book WHERE rent.ID = book.ID")
+                        raw_data = cursor.fetchall()
+
+                        ISBN_df = pd.DataFrame(raw_data, columns=['ID', 'rent_date', 'ISBN', '제목', '저자', '출판사'])
+                        ISBN_df['rent_year'] = pd.to_datetime(ISBN_df['rent_date']).dt.year
+                        ISBN_df = ISBN_df[ISBN_df['ISBN'] == '0']
+
+                        result_df = ISBN_df.groupby(['제목', '저자', '출판사']).agg(
+                            도서ID개수=('ID', lambda x: x.nunique()),  # 고유 도서 ID 개수
+                        ).reset_index()
+
+                        years = list(range(2004, 2025))
+                        for year in years:
+                            result_df[year] = 0  # 기본값 0 설정
+                        year_counts = ISBN_df.groupby(['제목', '저자', '출판사', 'rent_year']).size().unstack(fill_value=0)
+
+                        for year in years:
+                            if year in year_counts.columns:
+                                result_df[year] = result_df.set_index(['제목', '저자', '출판사']).index.map(year_counts[year])
+                        result_df = result_df.astype(object)
+
+                except Exception as e:
+                    error.append(str(e))
+
+                try:
+                    with connection.cursor() as cursor:
+                        insert_query = """
+                            INSERT INTO None_ISBN_rent_count 
+                            (title, author, publisher, ID_count, `2004`, `2005`, `2006`, `2007`, `2008`, `2009`, `2010`, `2011`, `2012`, `2013`, 
+                            `2014`, `2015`, `2016`, `2017`, `2018`, `2019`, `2020`, `2021`, `2022`, `2023`, `2024`) 
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE 
+                            ID_count = VALUES(ID_count),
+                            `2004` = VALUES(`2004`), `2005` = VALUES(`2005`), `2006` = VALUES(`2006`), 
+                            `2007` = VALUES(`2007`), `2008` = VALUES(`2008`), `2009` = VALUES(`2009`), 
+                            `2010` = VALUES(`2010`), `2011` = VALUES(`2011`), `2012` = VALUES(`2012`), 
+                            `2013` = VALUES(`2013`), `2014` = VALUES(`2014`), `2015` = VALUES(`2015`), 
+                            `2016` = VALUES(`2016`), `2017` = VALUES(`2017`), `2018` = VALUES(`2018`), 
+                            `2019` = VALUES(`2019`), `2020` = VALUES(`2020`), `2021` = VALUES(`2021`), 
+                            `2022` = VALUES(`2022`), `2023` = VALUES(`2023`), `2024` = VALUES(`2024`);
+                        """
+                        data_tuples = [
+                            (
+                                result_df.iloc[i, 0], result_df.iloc[i, 1], result_df.iloc[i, 2], result_df.iloc[i, 3], result_df.iloc[i, 4], 
+                                result_df.iloc[i, 5], result_df.iloc[i, 6], result_df.iloc[i, 7], result_df.iloc[i, 8], result_df.iloc[i, 9], 
+                                result_df.iloc[i, 10], result_df.iloc[i, 11], result_df.iloc[i, 12], result_df.iloc[i, 13], result_df.iloc[i, 14], 
+                                result_df.iloc[i, 15], result_df.iloc[i, 16], result_df.iloc[i, 17], result_df.iloc[i, 18], result_df.iloc[i, 19], 
+                                result_df.iloc[i, 20], result_df.iloc[i, 21], result_df.iloc[i, 22], result_df.iloc[i, 23], result_df.iloc[i, 24]
+                            )
+                            for i in range(len(result_df))
+                        ]
+                        cursor.executemany(insert_query, data_tuples)
+                    connection.commit()
+                except Exception as e:
+                    connection.rollback()  # 오류 발생 시 롤백
+                    error.append(str(e))
+
+
+            if '최근 대여 날짜 정보' in option:
+                try: 
+                    with connection.cursor() as cursor:
+                        cursor.execute("SELECT ID, registration FROM book")
+                        book_rows = cursor.fetchall()
+
+                        book_df = pd.DataFrame(book_rows, columns=['ID', '등록날짜'])
+                        book_df['등록날짜'] = pd.to_datetime(book_df['등록날짜'])
+
+                        cursor.execute("SELECT ID, rent_date FROM rent")
+                        rent_rows = cursor.fetchall()
+
+                        rent_df = pd.DataFrame(rent_rows, columns=['ID', '대여날짜'])
+                        rent_df['대여날짜'] = pd.to_datetime(rent_df['대여날짜'])
+
+                        latest_rent = rent_df.groupby('ID')['대여날짜'].max()
+
+                        default_date = latest_rent.max()
+
+                        book_df['Delta'] = None  # Delta 컬럼 생성 (초기값 None)
+                        book_df.set_index('ID', inplace=True)
+
+                        for book_id, last_rent_date in latest_rent.items():
+                            book_df.at[book_id, 'Delta'] = (default_date - last_rent_date).days
+
+                        book_df['Delta'] = book_df['Delta'].fillna((default_date - book_df['등록날짜']).dt.days)
+                        book_df = book_df.infer_objects(copy=False)
+                        book_df['Delta'] = book_df['Delta'].astype(int)
+
+                        book_df.reset_index(inplace=True)
+                        book_df['Delta'] = book_df['Delta'].astype(int)
+
+                        book_df['Delta'] = book_df['Delta'].apply(lambda x: max(x, 0))
+                except Exception as e:
+                    error.append(str(e))
+                
+                try:
+                    with connection.cursor() as cursor:
+                        insert_query = """
+                            INSERT INTO recent_rent (ID, duration) 
+                            VALUES (%s, %s)
+                            ON DUPLICATE KEY UPDATE 
+                            duration = VALUES(duration);
+                        """
+                        data_tuples = [
+                            (
+                                book_df.iloc[i, 0], book_df.iloc[i, 2],
+                            )
+                            for i in range(len(book_df))
+                        ]
+                        cursor.executemany(insert_query, data_tuples)
+                    connection.commit()
+                except Exception as e:
+                    connection.rollback()  # 오류 발생 시 롤백
+                    error.append(str(e))
+
+            if len(error) == 0:
+                return JsonResponse({'success': True, 'data': data})
+            else:
+                return JsonResponse({'success': False, 'message': str(e)}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
