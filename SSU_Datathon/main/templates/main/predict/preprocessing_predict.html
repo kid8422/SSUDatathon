@@ -1,0 +1,103 @@
+<!-- 예측 - 데이터 전처리 -->
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'main/css/preprocessing_predict.css' %}">
+<script src="{% static 'main/js/preprocessing_predict.js' %}"></script>
+<script>
+    const LOAD_DATA = "{% url 'load_db_update' %}";
+    const PREPROCESSING_DATA = "{% url 'preprocessing_db' %}";
+</script>
+{% endblock %}
+
+{% block title %}예측 - 데이터 전처리{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="tabs">
+                <!-- 대분류/중분류 탭 -->
+                <div class="content-tab active">최근 변경</div>
+            </div>
+            <div class="content-table">
+                <div class="db-box-title">
+                    <div class="db-table-title">테이블 명</div>
+                    <div class="db-time-title">최근 변경 시간</div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">도서 정보</div>
+                    <div class="db-time" id="book"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">대여 정보</div>
+                    <div class="db-time" id="rent"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">대분류 정보</div>
+                    <div class="db-time" id="large_classification"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">중분류 정보</div>
+                    <div class="db-time" id="middle_classification"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">대여 횟수 정보</div>
+                    <div class="db-time" id="rent_count"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">월별 대여 정보</div>
+                    <div class="db-time" id="year_month_count"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">월별 대여 세부 정보</div>
+                    <div class="db-time" id="year_month_count_detail"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">ISBN 제공 도서 대여 정보</div>
+                    <div class="db-time" id="ISBN_rent_count"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">ISBN 미제공 도서 대여 정보</div>
+                    <div class="db-time" id="None_ISBN_rent_count"></div>
+                </div>
+                <div class="db-box">
+                    <div class="db-table">최근 대여 날짜 정보</div>
+                    <div class="db-time" id="recent_rent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 선택창 -->
+        <div class="select-box">
+            <!-- 데이터 선택 -->
+            <div class="selection-box">
+                <div class="select-header">데이터 선택</div>
+                <div class="option">
+                    <input type="checkbox" id="optionAll" class="checkbox">
+                    <div class="label">전체 선택</div>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="option1" class="checkbox">
+                    <div class="label">ISBN 제공 도서 대여 정보</div>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="option2" class="checkbox">
+                    <div class="label">ISBN 미제공 도서 대여 정보</div>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="option3" class="checkbox">
+                    <div class="label">최근 대여 날짜 정보</div>
+                </div>
+            </div>
+            <!-- 버튼 -->
+            <div class="buttons">
+                <div class="button confirm">전처리</div>
+                <div class="button reset">선택 해제</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
