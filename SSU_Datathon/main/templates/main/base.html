@@ -5,7 +5,9 @@
     {% load static %}
     <!-- 기존 CSS 연결 -->
     <link rel="stylesheet" href="{% static 'main/css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/loading.css' %}">
     <script src="{% static 'main/js/sidebar.js' %}"></script>
+    <script type="module" src="{% static 'main/js/loading.js' %}"></script>
     {% block extra_head %}
     {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +15,22 @@
     
     <!-- Tailwind & Google Fonts 예시(필요 시) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          container: {
+            center: true,
+            screens: {
+              sm: "100%",
+              md: "100%",
+              lg: "100%",
+              xl: "100%",
+              "2xl": "100%",
+            },
+          },
+        },
+      };
+    </script>
     <script>
         const LOGOUT = "{% url 'DB_logout' %}";
         const HOME = "{% url 'DB_home' %}";
@@ -25,12 +43,10 @@
         const F4_PREDICT = "{% url 'f4_predict' %}";
         const B1_PREDICT = "{% url 'b1_predict' %}";
         const RATIO_PREDICT = "{% url 'ratio_predict' %}";
+        const PREPROCESSING_PREDICT = "{% url 'DB_preprocessing' %}";
         const DEVINFO = "{% url 'dev_info' %}";
     </script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
-      rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
   </head>
 
   <body>
@@ -98,6 +114,7 @@
               <a class="sub-menu-text" href="#" onclick="location.href=F4_PREDICT">4층인문 예측</a>
               <a class="sub-menu-text" href="#" onclick="location.href=B1_PREDICT">보존서고 예측</a>
               <a class="sub-menu-text" href="#" onclick="location.href=RATIO_PREDICT">분류별 최소치</a>
+              <a class="sub-menu-text" href="#" onclick="location.href=PREPROCESSING_PREDICT">데이터 전처리</a>
             </div>
           </div>
         </div>
@@ -117,6 +134,14 @@
         <!-- 각 페이지별 내용 -->
         {% endblock content %}
       </main>
+    </div>
+    <!-- 로딩 화면 -->
+    <div id="loadingOverlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">
+          <span>처리 중...</span>
+          <span id="loadingTime"></span> <!-- 소요된 시간 표시 -->
+      </div>
     </div>
   </body>
 </html>
