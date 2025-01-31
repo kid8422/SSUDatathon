@@ -4,7 +4,8 @@
   display: flex;
   flex: 1;
   position: relative;
-  min-height: 100vh; /* 세로 전체 화면 채우기 */
+  width: 100vw;
+  height: 100vh
 }
 .sidebar {
     user-select: none;       /* 텍스트 선택 방지 */
