@@ -1,25 +1,28 @@
-<!-- 데이터 관리 - 도서 정보 -->
+<!-- 예측 - 자세히 보기 -->
 {% extends 'main/base.html' %}
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'main/css/book_set.css' %}">
-<script src="{% static 'main/js/book_set.js' %}"></script>
+<link rel="stylesheet" href="{% static 'main/css/detail_predict.css' %}">
+<script src="{% static 'main/js/detail_predict.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
     const FILEICON = "{% static 'main/images/file.svg' %}";
     const WRENCH = "{% static 'main/images/wrench.svg' %}";
-    const DOWNLOADBOOK = "{% url 'download_book_data' %}";
-    const LOADBOOKDATA = "{% url 'load_book_data' %}";
-    const LOADMAXPAGELEN = "{% url 'load_book_max_page_len' %}";
+    const DOWNLOADBOOK = "{% url 'download_book_data_detail' %}";
+    const LOADBOOKDATA = "{% url 'load_book_data_detail' %}";
+    const LOADMAXPAGELEN = "{% url 'load_book_max_page_len_detail' %}";
     const ARROW = "{% static 'main/images/navigate.svg' %}";
     const SAVEADDBOOK = "{% url 'save_add_book' %}";
     const SAVEBOOKFILE = "{% url 'save_book_file' %}";
     const EDITBOOK = "{% url 'edit_book' %}";
+    const BOOKDATA = JSON.parse('{{ book|escapejs }}');
+    const LENBOOK = JSON.parse('{{ len|escapejs }}');
+    const LOCATIONDATA = "{{ location }}";
 </script>
 {% endblock %}
 
-{% block title %}데이터 관리 - 도서 정보{% endblock %}
+{% block title %}예측 - 자세히 보기{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -27,26 +30,34 @@
     <div class="content-container">
         <div class="content-box">
             <div class="Ctabs">
-                <div class="content-tab">도서정보</div>
+                <div class="content-tab">예측 결과</div>
             </div>
             <div class="option-container">
-                <div class="option-box" id="uploadBtn">
-                    <div class="option-img">
-                        <img src="{% static 'main/images/upload.svg' %}" alt="데이터 가져오기" class="option-icon">
-                    </div>
-                    <div class="option-text">가져오기</div>
-                </div>
                 <div class="option-box" id="downloadBtn">
                     <div class="option-img">
                         <img src="{% static 'main/images/download.svg' %}" alt="데이터 내보내기" class="option-icon">
                     </div>
                     <div class="option-text">내보내기</div>
                 </div>
-                <div class="option-box" id="addBookBtn">
+                <div class="option-box dropdown-container" id="orderdropdownContainer">
                     <div class="option-img">
-                        <img src="{% static 'main/images/book_btn.svg' %}" alt="데이터 추가하기" class="option-icon">
+                        <img src="{% static 'main/images/list.svg' %}" class="option-icon">
                     </div>
-                    <div class="option-text">도서추가</div>
+                    <div class="option-text current-order">오름차순</div>
+                    <div class="toggle-img">
+                        <img src="{% static 'main/images/toggle.svg' %}" class="toggle-icon">
+                    </div>
+                    <!-- 드롭다운 메뉴 -->
+                    <ul class="selection-menu hidden" id="orderDropdown">
+                        <li class="dropdown-item" data-value="오름차순">
+                            <div class="Rectangle45"></div>
+                            <span>오름차순</span>
+                        </li>
+                        <li class="dropdown-item" data-value="내림차순">
+                            <div class="Rectangle45"></div>
+                            <span>내림차순</span>
+                        </li>
+                    </ul>
                 </div>
                 <div class="option-box dropdown-container" id="dropdownContainer">
                     <div class="option-img">
@@ -92,141 +103,6 @@
             <div id="paginationContainer" class="pagination-container"></div>
         </div>
     </div>
-
-    <!-- (A) 가져오기 모달 -->
-    <div id="uploadModal" class="custom-modal">
-        <div class="modal-content">
-            <button class="modal-close" id="uploadModalClose">
-                <img src="{% static 'main/images/close.svg' %}" alt="닫기" class="close-icon" />
-            </button>
-            <div class="upload-section">
-                <label class="section-title">
-                    데이터 가져오기
-                    <span class="required-marker">*</span>
-                </label>
-                <label for="fileInput" class="upload-file-label">
-                    <span class="upload-file-text">파일 업로드 (*.csv, *.xls, *.xlsx)</span>
-                    <img src="{% static 'main/images/file.svg' %}" alt="파일 업로드" class="upload-file-icon" />
-                </label>
-                <input type="file" id="fileInput" class="file-input" accept=".csv, .xls, .xlsx"/>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    도서ID
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectId" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    등록일자
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectReg" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    수서방법
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectGet" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>        
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    분류코드
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectDDC" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    ISBN
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectISBN" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    서명
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectTitle" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    저자
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectAuth" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    출판사
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectPub" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    출판연도
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectPubyear" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    소장위치
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="colSelectLoc" class="column-select">
-                        <option value="">먼저 파일을 선택하세요</option>
-                    </select>
-                </div>
-            </div>
-            <div class="button-group">
-                <button class="save-btn">저장</button>
-                <button class="cancel-btn">취소</button>
-            </div>
-        </div>
-    </div>
-    
     
     <!-- (B) 내보내기 모달 -->
     <div id="downloadModal" class="custom-modal">

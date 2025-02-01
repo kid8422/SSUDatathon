@@ -1,4 +1,7 @@
 /* ========== 초기화 및 기본 설정 ========== */
+* {
+    box-sizing: border-box; /* 🔥 추가 */
+}
 
 body {
     font-family: 'Inter', sans-serif;
@@ -10,9 +13,12 @@ body {
 }
 
 .main-content {
-    display: flex; /* 가로 정렬 */
     height: 100vh; /* 전체 화면 높이 */
-    width: 100%;   /* 전체 화면 너비 */
+    width: 100vw;   /* 전체 화면 너비 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
 }
 
 /* 메인 컨테이너 */
@@ -111,7 +117,7 @@ body {
 /* 옵션 버튼들 컨테이너 */
 .option-container {
     user-select: none; /* 드래그 및 선택 방지 */
-    width: 48%;
+    width: 36%;
     padding-bottom: 1vh;
     background: #FAFAFA;
 
@@ -129,7 +135,7 @@ body {
 /* 개별 버튼 박스 */
 .option-box {
     position: relative;
-    width: 25%;
+    width: 33%;
     height: 7vh;
 
     background: #3BA4FF;
@@ -148,8 +154,8 @@ body {
     align-items: center;
     margin-left: 5%; /* 아이콘-텍스트 간격 */
     margin-right: 5%; /* 아이콘-텍스트 간격 */
-    width: 40%;
-    height: 40%;
+    width: 50%;
+    height: 50%;
 }
 
 .option-icon {

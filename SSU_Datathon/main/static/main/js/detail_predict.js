@@ -5,12 +5,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentPage = 1;
     let pageSize = 25;   // 기본값
     let maxPages = 5; // 기본값 (임시 1)
-    let importRows = null;
+    let order = 1;
 
     try {
-        // 초기 pageSize=25에 대한 최대 페이지 수 로딩
+        // 초기 pageSize=25에 대한 최대 페이지 수 로딩 
         maxPages = await load_max_page_len(pageSize);
-        console.log("최대 페이지 수:", maxPages);
     } catch (error) {
         console.error("최대 페이지 수 로드 오류:", error);
     }
@@ -54,6 +53,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener("click", (event) => {
         if (!dropdownContainer.contains(event.target)) {
             dropdownMenu.classList.add("hidden");
+        }
+    });
+
+    /* ================================
+        드롭다운 (정렬 선택) 관련
+    ================================ */
+    const orderdropdownContainer = document.getElementById("orderdropdownContainer");
+    const orderdropdownMenu = document.getElementById("orderDropdown");
+    const currentorder = document.querySelector(".current-order");
+
+    currentorder.textContent = LOCATIONDATA === "보존서고" ? "내림차순" : "오름차순";
+
+    orderdropdownContainer.addEventListener("click", (event) => {
+        event.stopPropagation();
+        // 드롭다운 열기/닫기
+        orderdropdownMenu.classList.toggle("hidden");
+
+        // dropdown-item 클릭 시 값 변경
+        const selectedItem = event.target.closest(".dropdown-item");
+        if (selectedItem) {
+            const neworder = selectedItem.dataset.value;
+            currentorder.textContent = neworder;
+            orderdropdownMenu.classList.add("hidden");
+            
+            if (neworder === "오름차순") {
+                order = LOCATIONDATA === "보존서고" ? 0 : 1;  // 보존서고면 내림차순, 아니면 오름차순
+            } else if (neworder === "내림차순") {
+                order = LOCATIONDATA === "보존서고" ? 1 : 0;  // 보존서고면 오름차순, 아니면 내림차순
+            }
+            currentPage = 1;
+            // 페이지크기 변경 시 다시 maxPages 로드 -> 테이블 로드
+            updateMaxPageAndReload();
+        }
+    });
+
+    document.addEventListener("click", (event) => {
+        if (!orderdropdownContainer.contains(event.target)) {
+            orderdropdownMenu.classList.add("hidden");
         }
     });
 
@@ -179,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========== 1) 테이블 헤더 (동적) ==========
     function createTableHeader() {
         /* 예시: 열 이름 (문자열 배열) */
-        const headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","소장위치","수정"];
+        const headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","예측 결과"];
         
         // 한 줄(헤더 행) 생성
         const tr = document.createElement("tr");
@@ -237,44 +274,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tr = document.createElement("tr");
 
             // row.length-1 까지 실제 데이터, 마지막 열에 수정 버튼
-            for (let i=0; i<row.length - 1; i++) {
+            for (let i=0; i<row.length; i++) {
                 const td = document.createElement("td");
                 td.textContent = row[i];
                 tr.appendChild(td);
             }
-            // 수정 버튼
-            const lastTd = document.createElement("td");
-            const editBtn = document.createElement("button");
-
-            // 수정하기 아이콘
-            const editIconWrapper = document.createElement("div");
-            editIconWrapper.classList.add("option-img");
-
-            const editIcon = document.createElement("img");
-            editIcon.src = WRENCH; // 이미지 경로
-            editIcon.alt = "수정";  // 대체 텍스트
-            editIcon.classList.add("option-icon");
-
-            editIconWrapper.appendChild(editIcon);
-
-            // 수정하기 텍스트
-            const editTextWrapper = document.createElement("div");
-            editTextWrapper.classList.add("edit-text");
-
-            const editText = document.createElement("div");
-            editText.textContent = "수정";
-            
-            editTextWrapper.appendChild(editText);
-
-            editBtn.classList.add("edit-btn");
-            editBtn.appendChild(editIconWrapper);
-            editBtn.appendChild(editTextWrapper);
-            
-            editBtn.addEventListener("click", () => {
-                openEditBookModal(row)
-            });
-            lastTd.appendChild(editBtn);
-            tr.appendChild(lastTd);
 
             tableBody.appendChild(tr);
         });
@@ -292,10 +296,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCookie("csrftoken")
                 },
-                body: JSON.stringify({ page: currentPage, pageSize })
+                body: JSON.stringify({ page: currentPage, pageSize: pageSize, order: order })
             });
             const json = await res.json();
             const results = json.data || [];
+            console.log(json);
             renderTable(results);
             renderPagination();
         } catch (err) {
@@ -311,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCookie("csrftoken"),
                 },
-                body: JSON.stringify({ pageSize: pageSize }),
+                body: JSON.stringify({ pageSize: pageSize, bookLen: LENBOOK}),
             });
             const data = await response.json();
             // data.data 에 최대 페이지 수가 있다고 가정
@@ -332,11 +337,6 @@ document.addEventListener('DOMContentLoaded', async () => {
          모달 / 버튼 공통 요소
     ================================ */
   
-    // (가져오기) 버튼 + 모달
-    const importBtn = document.getElementById('uploadBtn');
-    const importModal = document.getElementById('uploadModal');
-    const importModalClose = document.getElementById('uploadModalClose');
-  
     // (내보내기) 버튼 + 모달
     const downloadBtn = document.getElementById('downloadBtn');
     const downloadModal = document.getElementById('downloadModal');
@@ -346,181 +346,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addBookBtn = document.getElementById('addBookBtn');
     const addBookModal = document.getElementById('addBookModal');
     const addBookModalClose = document.getElementById('addBookModalClose');
-  
-    /* ================================
-         가져오기 (Import) 관련
-    ================================ */
-    // 파일 입력 및 컬럼 선택 요소
-    const fileInput = document.getElementById('fileInput');
-    const fileText = document.querySelector('.upload-file-text');
-    const fileLabel = document.querySelector('.upload-file-label');
-    const allSelects = document.querySelectorAll('.column-select');
-
-    // 파일 초기화 함수
-    function resetFileUpload() {
-        fileInput.value = "";  // 파일 선택 해제
-        // 초기 표시 문구로 되돌림
-        fileText.textContent = "파일 업로드 (*.csv, *.xls, *.xlsx)";
-        fileLabel.style.background = "#FFFFFF"; // 초기 흰색 배경
-        // 드롭다운도 초기화
-        allSelects.forEach(select => {
-            select.innerHTML = '<option value="">먼저 파일을 선택하세요</option>';
-        });
-    }
-  
-    // 가져오기 버튼: 모달 열기
-    importBtn.addEventListener('click', () => {
-        importModal.classList.add('show');
-    });
-  
-    // 닫기(X) 버튼: 모달 닫고 파일 상태 초기화
-    importModalClose.addEventListener('click', () => {
-        importModal.classList.remove('show');
-        resetFileUpload();
-    });
-  
-    // 가져오기 모달 내 저장/취소 버튼
-    const saveBtnInImport = importModal.querySelector('.save-btn');
-    const cancelBtnInImport = importModal.querySelector('.cancel-btn');
-  
-    // 취소 버튼: 모달 닫고 파일 상태 초기화
-    cancelBtnInImport.addEventListener('click', () => {
-        importModal.classList.remove('show');
-        resetFileUpload();
-    });
-
-    // saveBtnInImport 클릭 시 => 로직 추가 (ex: Ajax)
-    saveBtnInImport.addEventListener('click', async function () {
-        // 1) importRows가 존재하는지 확인
-        if (!importRows) {
-            alert("파일이 제대로 로드되지 않았습니다. 다시 시도하세요.");
-            return;
-        }
-
-        // 2) 각 <select>에서 선택된 값(열 정보) 가져오기
-        //    allSelects는 기존 코드에서 querySelectorAll('.column-select')로 얻은 배열
-        const selectedCols = [];
-        for (const selectElem of allSelects) {
-            const val = selectElem.value.trim();
-            if (!val) {
-                alert("모든 컬럼을 선택해야 합니다!");
-                return;
-            }
-            // 중복 검사
-            if (selectedCols.includes(val)) {
-                alert("각 컬럼은 중복 선택할 수 없습니다.");
-                return;
-            }
-            selectedCols.push(val);
-        }
-
-        const requestData = {
-            rows: importRows,
-            cols: selectedCols
-        };
-
-        try {
-            // 4) fetch 전송 (URL은 예시 "/importData"로 가정)
-            const response = await fetchWithLoading(SAVEBOOKFILE, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken")
-                },
-                body: JSON.stringify(requestData)
-                });
-            const result = await response.json();
-            
-            if (result.success) {
-                alert("예외도서 등록 완료");
-                // 모달 닫기 or 추가 로직
-                updateMaxPageAndReload();
-                importModal.classList.remove('show');
-                resetFileUpload();
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            console.error("가져오기 요청 중 오류:", error);
-            alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-    });
-
-    // 파일이 선택(또는 변경)될 때
-    fileInput.addEventListener('change', handleFile);
-  
-    /* ========== (1) 파일 읽고 SheetJS로 파싱 ========== */
-    function handleFile(evt) {
-        const file = evt.target.files[0];
-        if (!file) return;
-    
-        // 확장자 검사(추가 안전장치)
-        const allowed = ['csv', 'xls', 'xlsx'];
-        const ext = file.name.split('.').pop().toLowerCase();
-        if (!allowed.includes(ext)) {
-            alert('허용되지 않는 파일 형식입니다.');
-            fileInput.value = '';
-            return;
-        }
-    
-        // 라벨 배경색을 회색
-        fileLabel.style.background = '#DDDDDD';
-        fileText.textContent = file.name; // 선택한 파일명 표시
-    
-        // FileReader를 이용하여 파일 읽기 (ArrayBuffer)
-        const reader = new FileReader();
-        reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-  
-        // SheetJS로 workbook 생성
-        const workbook = XLSX.read(data, { type: 'array' });
-  
-        // 첫 번째 시트만 사용
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-  
-        // sheet_to_json, header: 1 -> 2차원 배열 형태 ([ [행1], [행2], ... ])
-        const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  
-        // rows[0] 는 첫 번째 행(배열). => 열 수
-        if (rows.length > 0) {
-            importRows = rows;
-            const firstRow = rows[0];
-            const colCount = firstRow.length;
-  
-            // (2) 드롭다운 생성
-            createColumnOptions(colCount);
-        }
-      };
-  
-      // reader가 arraybuffer로 읽어오도록 지정
-      reader.readAsArrayBuffer(file);
-    }
-  
-    /* ========== (2) 열 개수만큼 A, B, C... 생성해 <select>에 옵션 추가 ========== */
-    function createColumnOptions(colCount) {
-        // A, B, C, D... (26개 넘으면 COL27 등으로 처리)
-        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        // 모든 .column-select에 대해 반복
-        allSelects.forEach(selectElem => {
-            // 기존 옵션 초기화
-            selectElem.innerHTML = '<option value="">컬럼 선택</option>';
-
-            // 열 개수만큼 옵션 생성
-            for (let i = 0; i < colCount; i++) {
-            let colLetter;
-            if (i < 26) {
-                colLetter = alphabet[i];
-            } else {
-                colLetter = `COL${i + 1}`;
-            }
-            const option = document.createElement('option');
-            option.value = colLetter;
-            option.textContent = colLetter;
-            selectElem.appendChild(option);
-            }
-        });
-    }
   
     /* ================================
          내보내기 (download)
@@ -584,7 +409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             a.style.display = "none";
             a.href = url;
             const date = getFormattedDate(); // 오늘 날짜 가져오기
-            const fileName = `숭실대학교 도서관 예외도서정보 ${date}.csv`; // 파일 이름에 날짜 추가
+            const fileName = `숭실대학교 도서관 ${LOCATIONDATA} 서가관리 예측 결과 ${date}.csv`; // 파일 이름에 날짜 추가
             a.download = fileName; // 파일 이름
             document.body.appendChild(a);
             a.click();
@@ -616,7 +441,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bookPubYear = document.getElementById("bookPubYear");
     const bookLocation = document.getElementById("bookLocation");
     const checkbox = document.getElementById("option-except");
-    checkbox.checked = true;
 
     function closeAndClearAddBookModal() {
         addBookModal.classList.remove('show');
@@ -631,7 +455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         bookPublisher.value = "";
         bookPubYear.value = "";
         bookLocation.value = ""; // ""(선택하세요)
-        checkbox.checked = true;
+        checkbox.checked = false;
       }
     
     addBookBtn.addEventListener('click', () => {
@@ -639,7 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     addBookModalClose.addEventListener('click', () => {
-        addBookModal.classList.remove('show');
+          addBookModal.classList.remove('show');
         closeAndClearAddBookModal()
     });
   
@@ -691,7 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     
         try {
-          // 4) fetch -> POST 전송
+          // 4) fetchWithLoading -> POST 전송
           const response = await fetchWithLoading(SAVEADDBOOK, {
             method: "POST",
             headers: {
@@ -827,7 +651,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         editBookPublisher.value = bookData[7] || "";
         editBookPubYear.value = bookData[8] || "";
         editBookLocation.value = bookData[9] || "";
-        editOptionExcept.checked = bookData[10] || false;
+        const isExcept = (bookData[10] === '1');
+        editOptionExcept.checked = isExcept;
 
         // 도서ID 수정 불가
         editBookIdInput.readOnly = true;

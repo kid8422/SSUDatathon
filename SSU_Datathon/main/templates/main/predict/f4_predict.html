@@ -1,58 +1,80 @@
-<!-- 도서 이용 예측 - 4층 인문 대출 예측 -->
+<!-- 예측 - 4층인문 도서 예측 -->
 {% extends 'main/base.html' %}
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'main/css/main.css' %}">
-<script src="{% static 'main/js/main.js' %}"></script>
+<link rel="stylesheet" href="{% static 'main/css/f4_predict.css' %}">
+<script src="{% static 'main/js/f4_predict.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const LARGE_ICON = "{% static 'main/images/bar.svg' %}";
+    const LOAD_DATA = "{% url 'load_book_info_predict' %}";
+    const PREDICT_BOOK = "{% url 'predict_book_lib' %}";
+    const MOVEDETAIL = "{% url 'move_detail' %}";
+    const SAVEBOOKDATA = "{% url 'save_book_data' %}";
+</script>
 {% endblock %}
 
-{% block title %}도서 이용 예측 - 4층 인문 대출 예측{% endblock %}
+{% block title %}예측 - 4층인문 도서 예측{% endblock %}
 
 {% block content %}
-<div class="info-card">
-    <!-- 왼쪽 영역: 아이콘 + 제목 -->
-    <div class="left-container">
-        <div class="card-icon">
-            <img src="{% static 'main/images/graph.svg' %}" alt="정보 아이콘" class="icon-black">
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="tabs">
+                <div class="content-tab active">4층인문</div>
+            </div>
+            <div class="icon-box">
+                <img src="{% static 'main/images/bar.svg' %}" alt="데이터 없음" class="icon">
+            </div>
+            <!-- 선택된 데이터 없음 -->
+            <div class="no-data" id="noDataText">선택된 데이터가 없습니다</div>
+            <div class="chart-container">
+                <canvas class="chart" id="myChart" style="display: none;"></canvas>
+                <div id="custom-legend"></div> <!-- 차트 옆에 범례 추가 -->
+            </div>
         </div>
-        <span class="card-title">정보</span>
-    </div>
-    <!-- 구분선 -->
-    <div class="divider">|</div>
-    <!-- 오른쪽 영역: 부제목 -->
-    <div class="right-container">
-        <span class="card-subtitle">도서관 정보 시각화</span>
-    </div>
-</div>
-<div class="info-card">
-    <!-- 왼쪽 영역: 아이콘 + 제목 -->
-    <div class="left-container">
-        <div class="card-icon">
-            <img src="{% static 'main/images/data.svg' %}" alt="데이터 관리 아이콘" class="icon-black">
+
+        <!-- 선택창 -->
+        <div class="select-box">
+            <!-- 데이터 선택 -->
+            <div class="selection-box">
+                <div class="option-box">
+                    <div class="option-text">도서 위치</div>
+                </div>
+                <div class="dropdown-menu">
+                    <select id="locationSelect" class="column-select">
+                        <option value="3층사회">3층사회</option>
+                        <option value="3층자연">3층자연</option>     
+                        <option value="4층인문">4층인문</option>     
+                        <option value="5층문학">5층문학</option>
+                    </select>
+                </div>
+            </div>
+            <div class="selection-box">
+                <div class="option-box">
+                    <div class="option-text">도서 수량</div>
+                </div>
+                <input type="text" id="bookNum" class="text-input" placeholder="이동이 필요한 도서 수" />
+            </div>
+            <div class="selection-box">
+                <div class="option-box">
+                    <div class="option-text">데이터 연도</div>
+                </div>
+                <input type="text" id="bookYear" class="text-input" placeholder="최근 N년간 데이터 사용" />
+            </div>
+            <div class="selection-box">
+                <div class="option-box-btn predict-button">
+                    <div class="option-text">예측하기</div>
+                </div>
+            </div>
+            <div class="selection-box">
+                <div class="option-box-btn details-button">
+                    <div class="option-text">자세히 보기</div>
+                </div>
+            </div>
         </div>
-        <span class="card-title">데이터 관리</span>
-    </div>
-    <!-- 구분선 -->
-    <div class="divider">|</div>
-    <!-- 오른쪽 영역: 부제목 -->
-    <div class="right-container">
-        <span class="card-subtitle">실제 도서 정보 데이터베이스로 관리</span>
-    </div>
-</div>
-<div class="info-card">
-    <!-- 왼쪽 영역: 아이콘 + 제목 -->
-    <div class="left-container">
-        <div class="card-icon">
-            <img src="{% static 'main/images/search.svg' %}" alt="도서 이용 예측 아이콘" class="icon-black">
-        </div>
-        <span class="card-title">도서 이용 예측</span>
-    </div>
-    <!-- 구분선 -->
-    <div class="divider">|</div>
-    <!-- 오른쪽 영역: 부제목 -->
-    <div class="right-container">
-        <span class="card-subtitle">머신러닝을 활용한 도서 수요 예측</span>
     </div>
 </div>
 {% endblock content %}

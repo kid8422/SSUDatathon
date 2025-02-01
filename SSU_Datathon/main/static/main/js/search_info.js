@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(SEARCH_AUTOCOMPLETE, {
+            const response = await fetchWithLoading(SEARCH_AUTOCOMPLETE, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             showSuggestions(data.suggestions);
         } catch (error) {
-            console.error('Error fetching suggestions:', error);
+            console.error('Error fetch suggestions:', error);
         }
     }
 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 검색 결과 반환
     async function searchBooks(query) {
         try {
-            const response = await fetch(SEARCH_BOOK, {
+            const response = await fetchWithLoading(SEARCH_BOOK, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             displayResults(data.results);
         } catch (error) {
-            console.error('Error fetching results:', error);
+            console.error('Error fetch results:', error);
         }
     }
 

@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ---------------------------------------------
     async function loadData(selectedData) {
         try {
-            const response = await fetch(LOAD_DATA, {
+            const response = await fetchWithLoading(LOAD_DATA, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',

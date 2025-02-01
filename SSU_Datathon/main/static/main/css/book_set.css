@@ -1,4 +1,7 @@
 /* ========== 초기화 및 기본 설정 ========== */
+* {
+    box-sizing: border-box; /* 🔥 추가 */
+}
 
 body {
     font-family: 'Inter', sans-serif;
@@ -10,9 +13,12 @@ body {
 }
 
 .main-content {
-    display: flex; /* 가로 정렬 */
     height: 100vh; /* 전체 화면 높이 */
-    width: 100%;   /* 전체 화면 너비 */
+    width: 100vw;   /* 전체 화면 너비 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
 }
 
 /* 메인 컨테이너 */
@@ -135,28 +141,32 @@ body {
     background: #3BA4FF;
     border-radius: 0.5vw;
 
+    padding: 0% 3%;
+
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0 0.7vw;
 }
 
 .option-img {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 0.8vw; /* 아이콘-텍스트 간격 */
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
+    margin-right: 5%; /* 아이콘-텍스트 간격 */
+    width: 40%;
+    height: 40%;
 }
 
 .option-icon {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
 }
 
 /* 버튼 텍스트 */
 .option-text {
     color: #FFFFFF;
-    font-size: 110%;
+    font-size: 150%;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     text-align: center;
@@ -626,12 +636,12 @@ body {
     justify-content: center;
     padding: 0.3vh 0.6vw;
     cursor: pointer;
-    background-color: #fff;
+    background-color: transparent;
     color: #333;
 }
 
 .page-btn.active {
-    background-color: #FFF;
+    background-color: transparent;
     color: #3BA4FF;
     font-weight: 700;
     border: none;
@@ -639,7 +649,7 @@ body {
 
 /* 화살표 버튼 hover 효과 */
 .page-btn:hover {
-    background-color: #FFF;
+    background-color: transparent;
     color: #3BA4FF;
 }
 
