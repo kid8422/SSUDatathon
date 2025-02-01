@@ -260,6 +260,25 @@ canvas#myChart {
     pointer-events: none; /* 클릭 이벤트 무시 */
 }
 
+.location {
+    width: 100%;
+    font-size: 140%;
+    padding: 0.2vw 0.2vh 0.2vw 0.2vh;
+    border: 0.15vw solid #3BA4FF;
+    border-radius: 0.3vw;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.location-text {
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
 
 .column-select {
     position: relative;

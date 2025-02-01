@@ -1,0 +1,738 @@
+/* ========== 초기화 및 기본 설정 ========== */
+* {
+    box-sizing: border-box; /* 🔥 추가 */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FAFAFA;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+}
+
+.main-content {
+    height: 100vh; /* 전체 화면 높이 */
+    width: 100vw;   /* 전체 화면 너비 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+}
+
+/* 메인 컨테이너 */
+.container {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    align-items: center;     /* 수직 중앙 정렬 */
+    height: 95vh;           /* 전체 높이 */
+    padding: 2vw;           /* 내부 패딩 */
+    margin-top: 2vw;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: row; /* 가로 정렬 */
+    flex-grow: 1;        /* 남은 공간 차지 */
+    padding: 4vh;        /* 내부 패딩 */
+    gap: 1.5vw;          /* 요소 간 간격 */
+}
+
+/* 도서 현황 박스 */
+.content-box {
+    width: 100%;               /* 너비 비율 고정 */
+    height: 80vh;              /* 높이 비율 고정 */
+    background: white;
+    border: 0.2vw solid #D9D9D9; /* 테두리 추가 */
+    border-top: none;
+    border-left: none;   
+    box-shadow: 0.2vw 0.4vh 0.4vh rgba(0, 0, 0, 0.25); /* 그림자 */
+    border-radius: 0.5vw;         /* 둥근 모서리 */
+    position: relative;           /* 상대 위치 기준 */
+    justify-content: center;      /* 가로 중앙 정렬 */
+    align-items: center;          /* 세로 중앙 정렬 */
+}
+
+/* 탭 설정 */
+.Ctabs {
+    display: flex;
+    gap: 1vw;                   /* 버튼 간 간격 */
+    position: absolute;         /* 컨텐츠 박스를 기준으로 절대 위치 */
+    transform: translateY(-90%); /* 위쪽 이동 */
+    left: 0;                    /* 박스 왼쪽 끝에 고정 */
+}
+
+.content-tab {
+    padding: 1vh 2.4vw;         /* 내부 패딩 */
+    font-size: 1.8vw;           /* 글씨 크기 */
+    font-weight: 600;           /* 글씨 두께 */
+    cursor: default;            /* 클릭 커서 제거 */
+    pointer-events: none;       /* 클릭 비활성화 */
+    background: #3BA4FF;        /* 배경색 */
+    color: white;               /* 글씨 색상 */
+    border-radius: 1vw 1vw 0 0; /* 상단 둥근 모서리 */
+    box-shadow: 0px -0.3vh 0.6vh rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    user-select: none;          /* 드래그 및 선택 방지 */
+}
+
+/* 선택된 데이터 없음 */
+.no-data {
+    text-align: center;
+    color: rgba(153, 151, 152, 0.90);
+    font-size: 2vw; /* 폰트 크기 */
+    font-weight: 100;
+    margin-top: 1vh; /* 상단 여백 */
+    margin-bottom: 2vh;
+    position: absolute;
+    top: 55%; /* 아이콘 아래 위치 */
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.icon-box {
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    align-items: center;    /* 중앙 정렬 */
+    justify-content: center;
+    position: absolute;     /* 절대 위치 설정 */
+    top: 40%;               /* 상단 중앙 정렬 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 정확한 중앙 정렬 */
+    margin: 0 auto;
+    margin-top: 2vh;        /* 상단 여백 */
+}
+
+.icon {
+    align-items: center;  
+    justify-content: center;
+    width: 7vw;
+    height: 7vw;
+    border: none;           /* 테두리 제거 */
+    transform: none; 
+    border-radius: 0.5vw;   /* 둥근 모서리 유지 */
+}
+
+/* ---------------------- */
+/* 옵션 버튼들 컨테이너 */
+.option-container {
+    user-select: none; /* 드래그 및 선택 방지 */
+    width: 36%;
+    padding-bottom: 1vh;
+    background: #FAFAFA;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vw; /* 버튼들 간 간격 */
+
+    position: absolute;        
+    transform: translateY(-90%); 
+    right: 0;                
+    z-index: 9999;  
+}
+
+/* 개별 버튼 박스 */
+.option-box {
+    position: relative;
+    width: 33%;
+    height: 7vh;
+
+    background: #3BA4FF;
+    border-radius: 0.5vw;
+
+    padding: 0% 3%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.option-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
+    margin-right: 5%; /* 아이콘-텍스트 간격 */
+    width: 50%;
+    height: 50%;
+}
+
+.option-icon {
+    width: 100%;
+    height: 100%;
+}
+
+/* 버튼 텍스트 */
+.option-text {
+    color: #FFFFFF;
+    font-size: 150%;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* 드롭다운 컨테이너 */
+.dropdown-container {
+    position: relative;
+    cursor: pointer; /* 커서를 포인터로 변경 */
+    z-index: 9999;
+}
+
+/* 드롭다운 메뉴 */
+.selection-menu {
+    position: absolute;
+    top: calc(98%); /* 버튼 바로 아래 공간 */
+    left: calc(10%);
+    background: white;
+    border: 0.2vw solid #3BA4FF;
+    border-radius: 0.1vw;
+    width: 80%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 9999;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 숨겨진 상태 */
+.hidden {
+    display: none !important;
+}
+
+/* 드롭다운 항목 */
+.dropdown-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5vh 1vw;
+    cursor: pointer;
+    font-size: 1vw;
+    color: #333;
+    z-index: 9999;
+}
+
+/* 파란색 박스 스타일 */
+.Rectangle45 {
+    z-index: 9999;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(59, 164, 255, 0.50);
+    border: 1px solid #3BA4FF;
+    z-index: -1; /* 텍스트 뒤로 배치 */
+    top: 0;
+    left: 0;
+}
+
+/* 드롭다운 항목 마우스 hover */
+.dropdown-item:hover .Rectangle45 {
+    z-index: 9999;
+    background: rgba(59, 164, 255, 0.8);
+}
+
+/* 드롭다운 토글 버튼 */
+.toggle-img {
+    cursor: pointer;
+}
+
+/* 토글 아이콘 */
+.toggle-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 1vw;
+}
+
+.toggle-icon {
+    width: 1.6vw;
+    height: 1.6vw;
+}
+
+/* ---------------------- */
+/* 팝업(모달) 공통 스타일 */
+/* 모달 배경 */
+.custom-modal {
+    display: none;      
+    position: fixed; 
+    top: 0; 
+    left: 0;
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;      
+}
+
+.modal-body {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 세로 중앙 정렬 */
+    align-items: center; /* 가로 중앙 정렬 */
+    height: 100%; /* 부모 높이를 채움 */
+    padding: 2vh 0; /* 내부 여백 */
+}
+
+.modal-icon {
+    width: 5vw; 
+    height: 5vw;
+    margin-bottom: 3vh;
+}
+
+.file-icon {
+    width: 100%;
+    height: 100%;
+}
+
+/* 모달 열기시 */
+.custom-modal.show {
+    display: block;
+}
+
+/* 모달 컨텐츠 박스 */
+.modal-content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  
+    width: 30vw;   /* 모달 너비 */
+    height: 95vh;  /* 모달 높이 */
+    background: #3BA4FF;
+    border-radius: 20px;
+    box-sizing: border-box;
+    /* 스크롤 사용 시, 아래 커스텀 스타일 추가 */
+    /* (1) 안쪽 스크롤 */
+    overflow-y: auto; 
+    
+    /* (2) 스크롤바 커스텀 */
+    scrollbar-width: thin; /* 파이어폭스용(얇게) */
+    scrollbar-color: #999 #eee; /* FF용(thumb, track) */
+
+    padding: 3vw 4vh 3vw 4vh; /* 상단에 4rem 확보 => X버튼 공간 */
+    /* 아래 스크롤바 CSS 참고 */
+
+    display: flex;          /* 버튼 우측 정렬 위해 flex 사용 */
+    flex-direction: column; /* 항목을 수직으로 쌓음 */
+}
+
+/* -------- (2) 스크롤바 디자인 -------- */
+.modal-content::-webkit-scrollbar {
+    width: 12px;               /* 스크롤바 너비 */
+}
+.modal-content::-webkit-scrollbar-track {
+    background: #EEE;          /* 트랙 배경 */
+    border-radius: 10px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background: #999;          /* 스크롤 핸들 색상 */
+    border-radius: 10px;
+}
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 닫기 버튼 */
+.modal-close {
+    position: absolute;
+    top: 1vw;
+    right: 1vw;
+    width: 2vw; 
+    height: 2vw;
+    cursor: pointer;
+}
+.close-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.modal-text {
+    margin-bottom: 2vh;
+    color: #fff;
+    font-size: 1.2vw;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
+/* ========== 드롭다운 박스 (Select) 스타일 ========== */
+.text-input {
+    width: 100%;
+    font-size: 1vw;
+    padding: 0.5vw 1vh 0.5vw 0.8vh;
+    border: 1px solid #ccc;
+    border-radius: 0.3vw;
+    box-sizing: border-box;
+}
+
+.text-input[readonly] {
+    background-color: #DDDDDD;  /* 회색 배경 */
+    color: #666;             /* 텍스트 색 (연한 색상) */
+    cursor: not-allowed;     /* 커서를 '금지' 모양 */
+}
+
+.text-input[readonly]:focus {
+    outline: none;           /* 포커스 링 없애기 (선택) */
+}
+
+.column-select {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0.5vw 1vh 0.5vw 0.8vh;
+    font-size: 1vw;
+    border: 1px solid #ccc;
+    border-radius: 0.3vw;
+    outline: none;
+    background-color: #FFFFFF;
+  
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+  
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1vw;
+  }
+
+  .column-select-location {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0.5vw 1vh 0.5vw 0.8vh;
+    font-size: 1vw;
+    border: 1px solid #ccc;
+    border-radius: 0.3vw;
+    outline: none;
+    background-color: #FFFFFF;
+  
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+  
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1vw;
+  }
+  
+  /* IE / Edge 기본 화살표 제거 */
+  .column-select::-ms-expand {
+    display: none;
+  }
+
+  .column-select-location::-ms-expand {
+    display: none;
+  }
+  
+  .dropdown-menu {
+    position: relative; /* 부모 기준으로 위치 설정 */
+    width: 100%; /* select와 동일한 너비 */
+}
+
+  /* pseudo-element로 화살표 이미지 */
+  .dropdown-menu::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0.5vw; /* select의 오른쪽 여백 */
+    transform: translateY(-50%) rotate(90deg); /* 90도 회전 */
+    width: 2vw;
+    height: 2vw;
+    background: url("../images/navigate.svg") no-repeat center center;
+    filter: invert(1);
+    background-size: contain;
+    pointer-events: none; /* 클릭 이벤트 무시 */
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+}
+
+.checkbox {
+    width: 1.6vw; /* 체크박스 크기 */
+    height: 1.6vw;
+    border: 0.2vw solid black;
+    background: white;
+    margin-left: 0.7vw; /* 우측 여백 */
+    cursor: pointer;           /* 클릭 가능 커서 */
+}
+
+.checkbox input[type="checkbox"] {
+    display: none;             /* 기본 체크박스 숨김 */
+}
+
+.checkbox input[type="checkbox"]:checked + label::before {
+    content: '✔';              /* 체크 표시 추가 */
+    font-size: 1.2vw;          /* 체크 크기 */
+    color: #3BA4FF;            /* 체크 색상 */
+}
+
+.label {
+    margin-bottom: 1vh;
+    color: #fff;
+    font-size: 1.2vw;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
+/* ========== 저장/취소 버튼 ========== */
+/* 버튼 공통 */
+.save-btn,
+.cancel-btn {
+  background: black;
+  color: white;
+  padding: 0.7vh 1vw;
+  border-radius: 0.5vw;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1vw;
+  margin-top: 1vh;
+  margin-left: 0.5vw; /* 버튼 간격 */
+  margin-right: 0.5vw;
+}
+
+/* 버튼들을 우측 정렬하기 위한 래퍼 */
+.button-group {
+    margin-top: auto;               /* 나머지 내용 아래로 */
+    display: flex;
+    justify-content: flex-end;      /* 오른쪽 끝 정렬 */
+    align-items: center;
+}
+
+.button-group-download {
+    display: flex;
+    align-items: center;
+}
+
+/* 업로드 섹션, 라벨 등 */
+.upload-section {
+    margin-bottom: 2vh; 
+    display: flex;
+    flex-direction: column;
+}
+
+.section-title {
+    margin-bottom: 1vh;
+    color: #fff;
+    font-size: 1.2vw;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
+/* * 모양 스타일 */
+.required-marker {
+    color: rgba(214, 25, 48, 0.9); /* 빨간색 */
+    font-size: 1.2vw;             /* 텍스트 크기와 동일 */
+    font-weight: 600;
+    margin-left: 0.1vw;           /* 제목과 간격 */
+    line-height: 1;               /* 수직 정렬 */
+}
+
+/* 파일 업로드 라벨 */
+.upload-file-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 0.3vw;
+    cursor: pointer;
+    padding: 0.5vw 1vh;
+
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1vw;
+}
+
+.upload-file-text {
+    color: black;
+}
+
+.upload-file-icon {
+    width: 1.2vw;
+    height: 1.2vw;
+    filter: brightness(0) invert(0);
+}
+
+.file-input {
+    display: none; /* 클릭 유도용 라벨이 있기 때문에 감춤 */
+}
+
+/* (1) 테이블 레이아웃 */
+.data-table {
+    margin-top: 2vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100% - 1vh); /* 예시, 남은 공간 */
+}
+.table-header {
+    display: flex;
+    background-color: #eee;
+    font-weight: bold;
+    position: sticky; /* 스크롤 시 헤더 고정이 필요하면 */
+    top: 0;
+    z-index: 2;
+}
+.table-body {
+    flex: 1;
+    overflow-y: auto; 
+    overflow-x: auto;
+}
+.table-row {
+    display: flex;
+}
+.table-cell {
+    flex: 1;
+    border: 0.1vw solid #ccc;
+    padding: 0.5vw;
+    box-sizing: border-box;
+}
+.first-col {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 10;
+}
+.edit-btn {
+    background-color: #3BA4FF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.2rem;
+}
+
+/* (2) 페이지네이션 하단 이동 */
+.pagination-container {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 95%); /* 수평 중앙 정렬 */
+    display: flex;
+    gap: 0.5vh;
+    z-index: 999;
+}
+
+/* 화살표 아이콘 (SVG) */
+.arrow-icon {
+    position: relative;
+    width: 4vh;
+    height: 4vh;
+    padding: -2.1vh -2.1vw;
+    background-color: #3BA4FF;
+    border-radius: 0.2vw;
+    /*filter: brightness(0) invert(0);*/
+}
+/* 페이지 버튼 */
+.page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3vh 0.6vw;
+    cursor: pointer;
+    background-color: transparent;
+    color: #333;
+}
+
+.page-btn.active {
+    background-color: transparent;
+    color: #3BA4FF;
+    font-weight: 700;
+    border: none;
+}
+
+/* 화살표 버튼 hover 효과 */
+.page-btn:hover {
+    background-color: transparent;
+    color: #3BA4FF;
+}
+
+/* "데이터 없음" 래퍼 */
+#noDataWrapper {
+    position: relative;
+    top: 35%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.table-container {
+    width: 98%;
+    height: 95%; /* 예: 남은 공간 */
+    left: 1%;
+    overflow-x: auto; /* 가로 스크롤 */
+    overflow-y: auto; /* 세로 스크롤 */
+    position: relative;
+    margin-top: 1rem; /* 간격 */
+    background: #fff;
+    z-index: 1;
+}
+
+/* (3) 열 크기 조절을 위해 table-layout: fixed + resizable th */
+#bookTable {
+    table-layout: fixed; 
+    min-width: 100%; /* 열이 많다면 넉넉히 설정 */
+    border-collapse: collapse;
+}
+
+/* 열 헤더/셀 스타일 */
+#bookTable td {
+    width: 8vw; /* 예시로, 모든 열에 150px */
+    border: 0.1vw solid #ccc;
+    padding: 0.5vw;
+    box-sizing: border-box;
+    position: relative;
+}
+
+#bookTable th {
+    position: sticky;
+    top: 0;              /* 상단에서 0 px 떨어진 위치에 고정 */
+    z-index: 2;          /* 다른 요소 위에 표시 */
+    background: #fff;    /* 헤더 배경 */
+    width: 8vw; /* 예시로, 모든 열에 150px */
+    border: 0.1vw solid #ccc;
+    padding: 0.5vw;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* 열 헤더의 resizer 핸들 (엑셀처럼) */
+.column-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px; /* 드래그 영역 */
+    height: 100%;
+    cursor: col-resize;
+    background: transparent; /* 보이진 않음, hover하면 색상 가능 */
+    z-index: 10;
+}
+
+.edit-btn {
+    display: flex;
+    align-items: center;
+    gap: 0vw; /* 아이콘과 텍스트 간격 조정 */
+    background-color: #3BA4FF;
+    border-radius: 0.2vw;
+    cursor: pointer;
+    white-space: nowrap;  /* 🔥 텍스트 줄바꿈 방지 */
+}
+
+.option-icon {
+    width: 1vw; /* 원하는 크기로 조절 */
+    height: 1vw;
+}
+
+.option-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.edit-text {
+    font-size: 1vw;
+}

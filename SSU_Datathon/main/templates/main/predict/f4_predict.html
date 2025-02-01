@@ -9,7 +9,9 @@
 <script>
     const LARGE_ICON = "{% static 'main/images/bar.svg' %}";
     const LOAD_DATA = "{% url 'load_book_info_predict' %}";
-    const PREDICT_BOOK = "{% url 'predict_book_f4' %}";
+    const PREDICT_BOOK = "{% url 'predict_book_lib' %}";
+    const MOVEDETAIL = "{% url 'move_detail' %}";
+    const SAVEBOOKDATA = "{% url 'save_book_data' %}";
 </script>
 {% endblock %}
 
@@ -43,10 +45,10 @@
                 </div>
                 <div class="dropdown-menu">
                     <select id="locationSelect" class="column-select">
-                        <option value="1층인문">1층인문</option>
-                        <option value="2층인문">2층인문</option>     
-                        <option value="3층인문">3층인문</option>     
-                        <option value="4층인문">4층인문</option>
+                        <option value="3층사회">3층사회</option>
+                        <option value="3층자연">3층자연</option>     
+                        <option value="4층인문">4층인문</option>     
+                        <option value="5층문학">5층문학</option>
                     </select>
                 </div>
             </div>

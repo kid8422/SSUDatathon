@@ -1,0 +1,318 @@
+<!-- 예측 - 자세히 보기 -->
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'main/css/detail_predict.css' %}">
+<script src="{% static 'main/js/detail_predict.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+    const FILEICON = "{% static 'main/images/file.svg' %}";
+    const WRENCH = "{% static 'main/images/wrench.svg' %}";
+    const DOWNLOADBOOK = "{% url 'download_book_data_detail' %}";
+    const LOADBOOKDATA = "{% url 'load_book_data_detail' %}";
+    const LOADMAXPAGELEN = "{% url 'load_book_max_page_len_detail' %}";
+    const ARROW = "{% static 'main/images/navigate.svg' %}";
+    const SAVEADDBOOK = "{% url 'save_add_book' %}";
+    const SAVEBOOKFILE = "{% url 'save_book_file' %}";
+    const EDITBOOK = "{% url 'edit_book' %}";
+    const BOOKDATA = JSON.parse('{{ book|escapejs }}');
+    const LENBOOK = JSON.parse('{{ len|escapejs }}');
+    const LOCATIONDATA = "{{ location }}";
+</script>
+{% endblock %}
+
+{% block title %}예측 - 자세히 보기{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="Ctabs">
+                <div class="content-tab">예측 결과</div>
+            </div>
+            <div class="option-container">
+                <div class="option-box" id="downloadBtn">
+                    <div class="option-img">
+                        <img src="{% static 'main/images/download.svg' %}" alt="데이터 내보내기" class="option-icon">
+                    </div>
+                    <div class="option-text">내보내기</div>
+                </div>
+                <div class="option-box dropdown-container" id="orderdropdownContainer">
+                    <div class="option-img">
+                        <img src="{% static 'main/images/list.svg' %}" class="option-icon">
+                    </div>
+                    <div class="option-text current-order">오름차순</div>
+                    <div class="toggle-img">
+                        <img src="{% static 'main/images/toggle.svg' %}" class="toggle-icon">
+                    </div>
+                    <!-- 드롭다운 메뉴 -->
+                    <ul class="selection-menu hidden" id="orderDropdown">
+                        <li class="dropdown-item" data-value="오름차순">
+                            <div class="Rectangle45"></div>
+                            <span>오름차순</span>
+                        </li>
+                        <li class="dropdown-item" data-value="내림차순">
+                            <div class="Rectangle45"></div>
+                            <span>내림차순</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="option-box dropdown-container" id="dropdownContainer">
+                    <div class="option-img">
+                        <img src="{% static 'main/images/toggle_info.svg' %}" class="option-icon">
+                    </div>
+                    <div class="option-text current-page-size">25</div>
+                    <div class="toggle-img">
+                        <img src="{% static 'main/images/toggle.svg' %}" class="toggle-icon">
+                    </div>
+                    <!-- 드롭다운 메뉴 -->
+                    <ul class="selection-menu hidden" id="pageSizeDropdown">
+                        <li class="dropdown-item" data-value="25">
+                            <div class="Rectangle45"></div>
+                            <span> 25 </span>
+                        </li>
+                        <li class="dropdown-item" data-value="50">
+                            <div class="Rectangle45"></div>
+                            <span> 50 </span>
+                        </li>
+                        <li class="dropdown-item" data-value="100">
+                            <div class="Rectangle45"></div>
+                            <span>100</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="noDataWrapper">
+                <div class="icon-box" id="iconBox">
+                    <img src="{% static 'main/images/book.svg' %}" alt="데이터 없음" class="icon">
+                </div>
+                <div class="no-data" id="noDataText">도서정보를 찾을 수 없습니다</div>
+            </div>
+            <div class="table-container">
+                <table id="bookTable">
+                    <thead>
+                        <!-- 헤더 동적 생성 or 아래처럼 정적으로 생성할 수도 있음 -->
+                    </thead>
+                    <tbody>
+                        <!-- 바디 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationContainer" class="pagination-container"></div>
+        </div>
+    </div>
+    
+    <!-- (B) 내보내기 모달 -->
+    <div id="downloadModal" class="custom-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="downloadModalClose">
+                <img src="{% static 'main/images/close.svg' %}" alt="닫기" class="close-icon" />
+            </button>
+            <div class="modal-body">
+                <div class="modal-icon">
+                    <img src="{% static 'main/images/file.svg' %}" alt="파일 아이콘" class="file-icon" />
+                </div>
+                <div class="modal-text">
+                    파일을 .csv 형식으로 내보내기
+                </div>
+                <div class="button-group-download">
+                    <button id="confirmDownload" class="save-btn">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- (C) 도서추가 모달 -->
+    <div id="addBookModal" class="custom-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="addBookModalClose">
+                <img src="{% static 'main/images/close.svg' %}" alt="닫기" class="close-icon" />
+            </button>
+            <div class="upload-section">
+                <label class="section-title">
+                    도서ID
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookIdInput" class="text-input" placeholder="도서ID 입력 (형식: SS_ + 숫자(6))" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    등록일자
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookRegDate" class="text-input" placeholder="등록일자 입력 (형식: 2023-01-01)" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    수서방법
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookGetMethod" class="text-input" placeholder="수서방법 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    분류코드
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookDDC" class="text-input" placeholder="분류코드 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    ISBN
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookISBN" class="text-input" placeholder="ISBN 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    서명
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookTitle" class="text-input" placeholder="서명 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    저자
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookAuthor" class="text-input" placeholder="저자 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    출판사
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookPublisher" class="text-input" placeholder="출판사 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    출판연도
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="bookPubYear" class="text-input" placeholder="출판연도 입력 (형식: yyyy)" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    소장위치
+                    <span class="required-marker">*</span>
+                </label>
+                <div class="dropdown-menu">
+                    <select id="bookLocation" class="column-select-location">
+                        <option value="">소장위치 선택</option>
+                        <option value="4층인문">4층인문</option>
+                        <option value="보존서고">보존서고</option>
+                    </select>
+                </div>
+            </div>
+            <div class="upload-section">
+                <div class="option">
+                    <div class="label">예외 도서 지정</div>
+                    <input type="checkbox" id="option-except" class="checkbox">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="save-btn" id="addBookSaveBtn">저장</button>
+                <button class="cancel-btn" id="addBookCancelBtn">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- (D) 수정하기 모달 -->
+    <div id="editBookModal" class="custom-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="editBookModalClose">
+                <img src="{% static 'main/images/close.svg' %}" alt="닫기" class="close-icon" />
+            </button>
+            <div class="upload-section">
+                <label class="section-title">
+                    도서ID
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookIdInput" class="text-input" placeholder="도서ID" readonly />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    등록일자
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookRegDate" class="text-input" placeholder="등록일자 입력 (형식: 2023-01-01)" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    수서방법
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookGetMethod" class="text-input" placeholder="수서방법 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    분류코드
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookDDC" class="text-input" placeholder="분류코드 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    ISBN
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookISBN" class="text-input" placeholder="ISBN 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    서명
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookTitle" class="text-input" placeholder="서명 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    저자
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookAuthor" class="text-input" placeholder="저자 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    출판사
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookPublisher" class="text-input" placeholder="출판사 입력" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    출판연도
+                    <span class="required-marker">*</span>
+                </label>
+                <input type="text" id="editBookPubYear" class="text-input" placeholder="출판연도 입력 (형식: yyyy)" />
+            </div>
+            <div class="upload-section">
+                <label class="section-title">
+                    소장위치
+                    <span class="required-marker">*</span>
+                </label>
+                <div class="dropdown-menu">
+                    <select id="editBookLocation" class="column-select-location">
+                        <option value="">소장위치 선택</option>
+                        <option value="4층인문">4층인문</option>
+                        <option value="보존서고">보존서고</option>
+                    </select>
+                </div>
+            </div>
+            <div class="upload-section">
+                <div class="option">
+                    <div class="label">예외 도서 지정</div>
+                    <input type="checkbox" id="edit-option-except" class="checkbox">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="save-btn" id="editBookSaveBtn">저장</button>
+                <button class="cancel-btn" id="editBookCancelBtn">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
