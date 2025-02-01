@@ -666,3 +666,73 @@ def predict_book_b1(request):
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
 
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+##############################################################
+####################### 분류별 최소치 #########################
+###############################################################
+
+@login_required(login_url='DB_login')
+def setting_ratio(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)  # 요청 데이터 파싱
+        location = data.get('location')  # 선택된 데이터 가져오기
+        DDC = data.get('DDC')
+        quantity = int(data.get('quantity'))
+        keys = ['000', '100', '200', '300', '400', '500', '600', '700', '800', '900']
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
+            raw_data = cursor.fetchone()
+            value_list = raw_data[1:]
+            max_dict = dict(zip(keys, value_list))
+            print(max_dict)
+
+        with connection.cursor() as cursor:
+            if DDC == '전체':
+                update_statements = [
+                    f"`{key}` = {min(quantity, max_dict.get(key, quantity))}" for key in max_dict.keys()
+                ]
+                query = ", ".join(update_statements)
+                cursor.execute(f"""
+                            UPDATE DDC_ratio 
+                                SET {query}
+                                WHERE TAG = '{location}';
+                            """)
+            else:
+                v = min(max_dict[DDC], quantity)
+                cursor.execute(f"""
+                               UPDATE DDC_ratio SET `{DDC}` = {v} WHERE TAG = '{location}';
+                               """)
+        
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
+            raw_data = cursor.fetchone()
+            location_list = list(raw_data[1:])
+
+            cursor.execute(f"SELECT * FROM DDC_ratio WHERE TAG = '{location}'")
+            raw_data = cursor.fetchone()
+            ratio_list = list(raw_data[1:])
+
+            location_list_json = json.dumps(location_list)
+            ratio_list_json = json.dumps(ratio_list)
+        
+        return JsonResponse({'success': True, 'setting': ratio_list_json, 'location': location_list_json}, status=200)
+    
+@login_required(login_url='DB_login')
+def load_ratio(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)  # 요청 데이터 파싱
+        location = data.get('location')  # 선택된 데이터 가져오기
+        
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
+            raw_data = cursor.fetchone()
+            location_list = list(raw_data[1:])
+
+            cursor.execute(f"SELECT * FROM DDC_ratio WHERE TAG = '{location}'")
+            raw_data = cursor.fetchone()
+            ratio_list = list(raw_data[1:])
+
+            location_list_json = json.dumps(location_list)
+            ratio_list_json = json.dumps(ratio_list)
+        
+        return JsonResponse({'success': True, 'setting': ratio_list_json, 'location': location_list_json}, status=200)

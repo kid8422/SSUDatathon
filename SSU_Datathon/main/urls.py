@@ -42,4 +42,6 @@ urlpatterns = [
     path('load_book_data_detail/', predicts.load_book_data, name='load_book_data_detail'),
     path('download_book_data_detail/', predicts.download_book_data, name='download_book_data_detail'),
     path('predict_book_b1/', predicts.predict_book_b1, name='predict_book_b1'),
+    path('setting_ratio/', predicts.setting_ratio, name='setting_ratio'),
+    path('load_ratio/', predicts.load_ratio, name='load_ratio'),
 ]
