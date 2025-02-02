@@ -5,9 +5,13 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'main/css/search_info.css' %}">
 <script src="{% static 'main/js/search_info.js' %}"></script>
+<script type="module" src="{% static 'main/js/hangul_utils.js' %}"></script>
 <script>
     const SEARCH_AUTOCOMPLETE = "{% url 'autocomplete' %}";
     const SEARCH_BOOK = "{% url 'book_search' %}";
+    const LOADBOOK = "{% url 'load_book_search' %}";
+    const SEARCHICON = "{% static 'main/images/book_search.svg' %}";
+    const ARROW = "{% static 'main/images/navigate.svg' %}";
 </script>
 {% endblock %}
 
@@ -22,7 +26,27 @@
                 <!-- 대분류/중분류 탭 -->
                 <div class="content-tab">도서검색</div>
             </div>
+            <div id="noDataWrapper">
+                <div class="icon-box" id="iconBox">
+                    <img src="{% static 'main/images/book.svg' %}" alt="데이터 없음" class="icon">
+                </div>
+                <div class="no-data" id="noDataText">도서정보를 찾을 수 없습니다</div>
+            </div>
+            <div class="table-container">
+                <table id="bookTable">
+                    <thead>
+                        <!-- 헤더 동적 생성 or 아래처럼 정적으로 생성할 수도 있음 -->
+                    </thead>
+                    <tbody>
+                        <!-- 바디 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationContainer" class="pagination-container"></div>
             <div class="search">
+                <div class="suggestions" id="suggestion-box">
+                    <ul id="suggestion-list"></ul>
+                </div>                
                 <div class="search-button">
                     <div class="search-button-rectangle">
                         <div class="search-icon-container">
@@ -49,14 +73,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="icon-box">
-                <img src="{% static 'main/images/book.svg' %}" alt="데이터 없음" class="icon">
-            </div>
-            <!-- 선택된 데이터 없음 -->
-            <div class="no-data" id="noDataText">도서정보를 찾을 수 없습니다</div>
-            <canvas class="chart" id="myChart" style="display: none;"></canvas>
-            <div class="table" id="myTable" style="display: none;"></div>
         </div>
     </div>
 </div>

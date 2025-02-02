@@ -135,7 +135,7 @@ body {
     background: #3BA4FF;
     border-radius: 0.5vw;
 
-    padding: 0% 3%;
+    padding: 0 1%;
 
     display: flex;
     justify-content: center;
@@ -143,13 +143,13 @@ body {
 }
 
 .option-img {
+    width: 15%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-left: 5%; /* 아이콘-텍스트 간격 */
     margin-right: 5%; /* 아이콘-텍스트 간격 */
-    width: 40%;
-    height: 40%;
 }
 
 .option-icon {
@@ -160,7 +160,7 @@ body {
 /* 버튼 텍스트 */
 .option-text {
     color: #FFFFFF;
-    font-size: 150%;
+    font-size: 130%;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     text-align: center;
@@ -594,13 +594,36 @@ body {
     background-color: white;
     z-index: 10;
 }
+
 .edit-btn {
     background-color: #3BA4FF;
     color: white;
     border: none;
     cursor: pointer;
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.2rem;
+    border-radius: 0.2vw;
+    gap: 0vw; /* 아이콘과 텍스트 간격 조정 */
+    padding: 0 1%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;  /* 🔥 텍스트 줄바꿈 방지 */
+    position: relative;
+    width: 80%;
+    height: 4.5vh;
+}
+
+.edit-text {
+    font-size: 120%;
+}
+
+.option-img-edit {
+    width: 25%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
+    margin-right: 3%; /* 아이콘-텍스트 간격 */
 }
 
 /* (2) 페이지네이션 하단 이동 */
@@ -705,28 +728,4 @@ body {
     cursor: col-resize;
     background: transparent; /* 보이진 않음, hover하면 색상 가능 */
     z-index: 10;
-}
-
-.edit-btn {
-    display: flex;
-    align-items: center;
-    gap: 0vw; /* 아이콘과 텍스트 간격 조정 */
-    background-color: #3BA4FF;
-    border-radius: 0.2vw;
-    cursor: pointer;
-    white-space: nowrap;  /* 🔥 텍스트 줄바꿈 방지 */
-}
-
-.option-icon {
-    width: 1vw; /* 원하는 크기로 조절 */
-    height: 1vw;
-}
-
-.option-icon {
-    width: 100%;
-    height: 100%;
-}
-
-.edit-text {
-    font-size: 1vw;
 }

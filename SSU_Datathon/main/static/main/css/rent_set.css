@@ -135,7 +135,7 @@ body {
     background: #3BA4FF;
     border-radius: 0.5vw;
 
-    padding: 0% 3%;
+    padding: 0 1%;
 
     display: flex;
     justify-content: center;
@@ -143,12 +143,23 @@ body {
 }
 
 .option-img {
+    width: 15%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
     margin-right: 5%; /* 아이콘-텍스트 간격 */
-    width: 40%;
-    height: 40%;
+}
+
+.option-img {
+    width: 20%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
+    margin-right: 5%; /* 아이콘-텍스트 간격 */
 }
 
 .option-icon {
@@ -156,14 +167,33 @@ body {
     height: 100%;
 }
 
+/* 토글 아이콘 */
+.toggle-img {
+    width: 20%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
+    margin-right: 5%; /* 아이콘-텍스트 간격 */
+}
+
+.toggle-icon {
+    width: 100%;
+    height: 100%;
+}
+
+
 /* 버튼 텍스트 */
 .option-text {
     color: #FFFFFF;
-    font-size: 150%;
+    font-size: 120%;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     text-align: center;
     white-space: nowrap;
+    margin-left: 3%; /* 아이콘-텍스트 간격 */
+    margin-right: 3%; /* 아이콘-텍스트 간격 */
 }
 
 /* 드롭다운 컨테이너 */
@@ -231,21 +261,6 @@ body {
     cursor: pointer;
 }
 
-/* 토글 아이콘 */
-.toggle-img {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 5%; /* 아이콘-텍스트 간격 */
-    margin-right: 5%; /* 아이콘-텍스트 간격 */
-    width: 40%;
-    height: 40%;
-}
-
-.toggle-icon {
-    width: 100%;
-    height: 100%;
-}
 
 /* ---------------------- */
 /* 팝업(모달) 공통 스타일 */

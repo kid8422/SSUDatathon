@@ -268,7 +268,7 @@ def load_db_update(request):
 
             with connection.cursor() as cursor:
                 for table in db:
-                    cursor.execute(f"SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = '{NAME}' AND TABLE_NAME = '{table}'")
+                    cursor.execute(f"SELECT `timestamp` FROM timestamp WHERE `table` = '{table}'")
                     raw_data = cursor.fetchall()[0]
                     if raw_data[0] == None:
                         d = "변동 내역 없음"
