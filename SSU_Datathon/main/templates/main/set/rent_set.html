@@ -13,7 +13,7 @@
     const LOADRENTDATA = "{% url 'load_rent_data' %}";
     const LOADMAXPAGELEN = "{% url 'load_rent_max_page_len' %}";
     const ARROW = "{% static 'main/images/navigate.svg' %}";
-    const SAVEADDRENT = "{% url 'save_add_book' %}";
+    const SAVERENTFILE = "{% url 'save_rent_file' %}";
 </script>
 {% endblock %}
 
@@ -168,96 +168,6 @@
                 <div class="button-group-download">
                     <button id="confirmDownload" class="save-btn">확인</button>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    
-    <!-- (C) 도서추가 모달 -->
-    <div id="addBookModal" class="custom-modal">
-        <div class="modal-content">
-            <button class="modal-close" id="addBookModalClose">
-                <img src="{% static 'main/images/close.svg' %}" alt="닫기" class="close-icon" />
-            </button>
-            <div class="upload-section">
-                <label class="section-title">
-                    도서ID
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookIdInput" class="text-input" placeholder="도서ID 입력 (형식: SS_ + 숫자(6))" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    등록일자
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookRegDate" class="text-input" placeholder="등록일자 입력 (형식: 2023-01-01)" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    수서방법
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookGetMethod" class="text-input" placeholder="수서방법 입력" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    분류코드
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookDDC" class="text-input" placeholder="분류코드 입력" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    ISBN
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookISBN" class="text-input" placeholder="ISBN 입력" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    서명
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookTitle" class="text-input" placeholder="서명 입력" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    저자
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookAuthor" class="text-input" placeholder="저자 입력" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    출판사
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookPublisher" class="text-input" placeholder="출판사 입력" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    출판연도
-                    <span class="required-marker">*</span>
-                </label>
-                <input type="text" id="bookPubYear" class="text-input" placeholder="출판연도 입력 (형식: yyyy)" />
-            </div>
-            <div class="upload-section">
-                <label class="section-title">
-                    소장위치
-                    <span class="required-marker">*</span>
-                </label>
-                <div class="dropdown-menu">
-                    <select id="bookLocation" class="column-select">
-                        <option value="">선택하세요</option>
-                        <option value="4층인문">4층인문</option>
-                        <option value="보존서고">보존서고</option>
-                    </select>
-                </div>
-            </div>
-            <div class="button-group">
-                <button class="save-btn" id="addBookSaveBtn">저장</button>
-                <button class="cancel-btn" id="addBookCancelBtn">취소</button>
             </div>
         </div>
     </div>

@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let pageSize = 25;   // 기본값
     let maxPages = 5; // 기본값 (임시 1)
     let order = 1;
+    let headers = [];
 
     try {
         // 초기 pageSize=25에 대한 최대 페이지 수 로딩 
         maxPages = await load_max_page_len(pageSize);
     } catch (error) {
-        console.error("최대 페이지 수 로드 오류:", error);
     }
     
     async function updateMaxPageAndReload() {
@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentPage = 1;
             loadTableData();
         } catch (err) {
-            console.error("update max page error:", err);
         }
     }
 
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orderdropdownMenu = document.getElementById("orderDropdown");
     const currentorder = document.querySelector(".current-order");
 
-    currentorder.textContent = LOCATIONDATA === "보존서고" ? "내림차순" : "오름차순";
+    currentorder.textContent = (LOCATIONDATA === "보존서고" || LOCATIONDATA === "전체") ? "내림차순" : "오름차순";
 
     orderdropdownContainer.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -78,9 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             orderdropdownMenu.classList.add("hidden");
             
             if (neworder === "오름차순") {
-                order = LOCATIONDATA === "보존서고" ? 0 : 1;  // 보존서고면 내림차순, 아니면 오름차순
+                order = (LOCATIONDATA === "보존서고" || LOCATIONDATA === "전체") ? 0 : 1;  // 보존서고면 내림차순, 아니면 오름차순
             } else if (neworder === "내림차순") {
-                order = LOCATIONDATA === "보존서고" ? 1 : 0;  // 보존서고면 오름차순, 아니면 내림차순
+                order = (LOCATIONDATA === "보존서고" || LOCATIONDATA === "전체") ? 1 : 0;  // 보존서고면 오름차순, 아니면 내림차순
             }
             currentPage = 1;
             // 페이지크기 변경 시 다시 maxPages 로드 -> 테이블 로드
@@ -216,7 +215,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========== 1) 테이블 헤더 (동적) ==========
     function createTableHeader() {
         /* 예시: 열 이름 (문자열 배열) */
-        const headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","예측 결과"];
+        if (LOCATIONDATA !== "전체") {
+            headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","예측 결과"];
+        } else {
+            headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","소장위치","예측 결과"];
+        }
         
         // 한 줄(헤더 행) 생성
         const tr = document.createElement("tr");
@@ -288,7 +291,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         테이블 데이터 로드
     ================================ */
     async function loadTableData() {
-        console.log("Load data -> page:", currentPage, "pageSize:", pageSize);
         try {
             const res = await fetchWithLoading(LOADBOOKDATA, {
                 method: "POST",
@@ -300,11 +302,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const json = await res.json();
             const results = json.data || [];
-            console.log(json);
             renderTable(results);
             renderPagination();
         } catch (err) {
-            console.error("loadTableData error:", err);
         }
     }
 
@@ -320,10 +320,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const data = await response.json();
             // data.data 에 최대 페이지 수가 있다고 가정
-            console.log("load_max_page_len 응답:", data.data);
             return data.data; 
         } catch (error) {
-            console.error("최대 페이지 수 요청 오류:", error);
             return 1; // 오류 시 1
         }
     }
@@ -342,11 +340,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const downloadModal = document.getElementById('downloadModal');
     const downloadModalClose = document.getElementById('downloadModalClose');
   
-    // (도서추가) 버튼 + 모달
-    const addBookBtn = document.getElementById('addBookBtn');
-    const addBookModal = document.getElementById('addBookModal');
-    const addBookModalClose = document.getElementById('addBookModalClose');
-  
     /* ================================
          내보내기 (download)
     ================================ */
@@ -364,14 +357,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               headers: {
                   'Content-Type': 'application/json',
                   'X-CSRFToken': getCookie("csrftoken"),
-              }
+              },
+              body: JSON.stringify({ location: LOCATIONDATA })
           });
           const rawdata = await response.json();
           const data = rawdata.data;
           return data;
       }
       catch (error) {
-          console.error(error);
           return []; // 오류 발생 시 빈 배열 반환
       }
     }
@@ -381,7 +374,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveBtnInDownload.addEventListener('click', async function () {
       try {
           const data = await downloadBookData(); // 데이터를 변수에 저장
-          console.log(data)
 
           downloadModal.classList.remove('show');
           if (data.length > 0) {
@@ -420,250 +412,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
       }
       catch (error) {
-        console.error(error);
       }
     });
-
-  
-  
-    /* ================================
-         도서추가 (AddBook)
-    ================================ */
-    // [필드 참조]
-    const bookIdInput = document.getElementById("bookIdInput");
-    const bookRegDate = document.getElementById("bookRegDate");
-    const bookGetMethod = document.getElementById("bookGetMethod");
-    const bookDDC = document.getElementById("bookDDC");
-    const bookISBN = document.getElementById("bookISBN");
-    const bookTitle = document.getElementById("bookTitle");
-    const bookAuthor = document.getElementById("bookAuthor");
-    const bookPublisher = document.getElementById("bookPublisher");
-    const bookPubYear = document.getElementById("bookPubYear");
-    const bookLocation = document.getElementById("bookLocation");
-    const checkbox = document.getElementById("option-except");
-
-    function closeAndClearAddBookModal() {
-        addBookModal.classList.remove('show');
-        // 입력값 초기화
-        bookIdInput.value = "";
-        bookRegDate.value = "";
-        bookGetMethod.value = "";
-        bookDDC.value = "";
-        bookISBN.value = "";
-        bookTitle.value = "";
-        bookAuthor.value = "";
-        bookPublisher.value = "";
-        bookPubYear.value = "";
-        bookLocation.value = ""; // ""(선택하세요)
-        checkbox.checked = false;
-      }
-    
-    addBookBtn.addEventListener('click', () => {
-        addBookModal.classList.add('show');
-    });
-
-    addBookModalClose.addEventListener('click', () => {
-          addBookModal.classList.remove('show');
-        closeAndClearAddBookModal()
-    });
-  
-    const saveBtnInAddBook = addBookModal.querySelector('.save-btn');
-    const cancelBtnInAddBook = addBookModal.querySelector('.cancel-btn');
-    cancelBtnInAddBook.addEventListener('click', () => {
-        addBookModal.classList.remove('show');
-        closeAndClearAddBookModal()
-    });
-    
-    saveBtnInAddBook.addEventListener('click', async () => {
-        // 1) 값 가져오기
-        const bookId = bookIdInput.value.trim();
-        const regDate = bookRegDate.value.trim();
-        const getMethod = bookGetMethod.value.trim();
-        const ddc = bookDDC.value.trim();
-        const isbn = bookISBN.value.trim();
-        const title = bookTitle.value.trim();
-        const author = bookAuthor.value.trim();
-        const publisher = bookPublisher.value.trim();
-        const pubYear = bookPubYear.value.trim();
-        const location = bookLocation.value; // select => 빈문자(선택) or 실제 값
-        const checkbox = document.getElementById("option-except");
-    
-        // 2) 필수 항목 검증
-        if (!bookId || !regDate || !getMethod || !ddc || !isbn || !title || !author || !publisher || !pubYear) {
-          alert("모든 필수 항목을 입력하세요!");
-          return;
-        }
-        if (!["4층인문", "보존서고"].includes(location)) {
-          alert("소장 위치를 선택하세요!");
-          return;
-        }
-    
-        // 3) 서버로 전송할 데이터 구성
-        const checked = checkbox.checked
-        const requestData = {
-            bookId,       // bookId: bookId, 
-            regDate,
-            getMethod,
-            ddc,
-            isbn,
-            title,
-            author,
-            publisher,
-            pubYear,
-            location,
-            checked
-        };
-    
-        try {
-          // 4) fetchWithLoading -> POST 전송
-          const response = await fetchWithLoading(SAVEADDBOOK, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCookie("csrftoken")
-            },
-            body: JSON.stringify(requestData)
-          });
-          const result = await response.json();
-    
-          if (result.success) {
-            alert("도서 정보가 성공적으로 저장되었습니다.");
-            // 모달 닫고 값 초기화
-            updateMaxPageAndReload();
-            closeAndClearAddBookModal();
-          } else {
-            alert(result.message);
-          }
-        } catch (error) {
-          console.error("저장 요청 중 오류 발생:", error);
-          alert("오류가 발생했습니다. 다시 시도하세요.");
-        }
-      });
-
-    /* ================================
-     도서수정 (EditBook)
-    ================================ */
-    const editBookModal = document.getElementById("editBookModal");
-    const editBookModalClose = document.getElementById("editBookModalClose");
-    const editBookSaveBtn = document.getElementById("editBookSaveBtn");
-    const editBookCancelBtn = document.getElementById("editBookCancelBtn");
-
-    // 수정 모달의 각 필드
-    const editBookIdInput = document.getElementById("editBookIdInput");
-    const editBookRegDate = document.getElementById("editBookRegDate");
-    const editBookGetMethod = document.getElementById("editBookGetMethod");
-    const editBookDDC = document.getElementById("editBookDDC");
-    const editBookISBN = document.getElementById("editBookISBN");
-    const editBookTitle = document.getElementById("editBookTitle");
-    const editBookAuthor = document.getElementById("editBookAuthor");
-    const editBookPublisher = document.getElementById("editBookPublisher");
-    const editBookPubYear = document.getElementById("editBookPubYear");
-    const editBookLocation = document.getElementById("editBookLocation");
-    const editOptionExcept = document.getElementById("edit-option-except");
-
-    function closeAndClearEditBookModal() {
-        editBookModal.classList.remove('show');
-        editBookIdInput.value = "";
-        editBookRegDate.value = "";
-        editBookGetMethod.value = "";
-        editBookDDC.value = "";
-        editBookISBN.value = "";
-        editBookTitle.value = "";
-        editBookAuthor.value = "";
-        editBookPublisher.value = "";
-        editBookPubYear.value = "";
-        editBookLocation.value = ""; 
-        editOptionExcept.checked = false;
-    }
-
-    // (1) X 버튼
-    editBookModalClose.addEventListener('click', closeAndClearEditBookModal);
-    // (2) 취소 버튼
-    editBookCancelBtn.addEventListener('click', closeAndClearEditBookModal);
-
-    // (3) 확인(저장) 버튼
-    editBookSaveBtn.addEventListener('click', async () => {
-        // 유효성 검사
-        const bookId = editBookIdInput.value.trim();
-        const regDate = editBookRegDate.value.trim();
-        const getMethod = editBookGetMethod.value.trim();
-        const ddc = editBookDDC.value.trim();
-        const isbn = editBookISBN.value.trim();
-        const title = editBookTitle.value.trim();
-        const author = editBookAuthor.value.trim();
-        const publisher = editBookPublisher.value.trim();
-        const pubYear = editBookPubYear.value.trim();
-        const location = editBookLocation.value;
-        const checked = editOptionExcept.checked;
-
-        if (!bookId || !regDate || !getMethod || !ddc || !isbn || !title || !author || !publisher || !pubYear) {
-            alert("필수 항목을 모두 입력하세요!");
-            return;
-        }
-        if (!["4층인문", "보존서고"].includes(location)) {
-            alert("소장 위치를 선택하세요!");
-            return;
-        }
-
-        // 서버에 전송할 데이터
-        const requestData = {
-            bookId, regDate, getMethod, ddc, isbn, title, author,
-            publisher, pubYear, location, checked
-        };
-
-        try {
-            const response = await fetchWithLoading(EDITBOOK, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken")
-                },
-                body: JSON.stringify(requestData)
-            });
-            const result = await response.json();
-            if (result.success) {
-                alert("도서 정보가 성공적으로 수정되었습니다.");
-                // 테이블 리로드 etc...
-                updateMaxPageAndReload();
-                closeAndClearEditBookModal();
-            } else {
-                alert(result.message || "수정 실패");
-            }
-        } catch (error) {
-            console.error("수정 요청 오류:", error);
-            alert("오류가 발생했습니다.");
-        }
-    });
-
-    // (4) 열기 함수: 도서 정보로 필드 채우기 + 모달 열기
-    function openEditBookModal(bookData) {
-        // bookData 예: {
-        //   id: "SS_000012", regDate: "2023-01-01", ...
-        // }
-        console.log(bookData);
-        editBookIdInput.value = bookData[0] || "";
-        editBookRegDate.value = bookData[1] || "";
-        editBookGetMethod.value = bookData[2] || "";
-        editBookDDC.value = bookData[3] || "";
-        editBookISBN.value = bookData[4] || "";
-        editBookTitle.value = bookData[5] || "";
-        editBookAuthor.value = bookData[6] || "";
-        editBookPublisher.value = bookData[7] || "";
-        editBookPubYear.value = bookData[8] || "";
-        editBookLocation.value = bookData[9] || "";
-        const isExcept = (bookData[10] === '1');
-        editOptionExcept.checked = isExcept;
-
-        // 도서ID 수정 불가
-        editBookIdInput.readOnly = true;
-
-        // 모달 열기
-        editBookModal.classList.add('show');
-    }
-    
 });
-
-
 
   function getCookie(name) {
     let cookieValue = null;

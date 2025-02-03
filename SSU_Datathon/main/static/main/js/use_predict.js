@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
 
-    const locationSelect = document.getElementById("locationSelect");
-    const contentTab = document.querySelector(".content-tab");
     const bookNumInput = document.getElementById("bookNum");
     const bookYearInput = document.getElementById("bookYear");
     const predictButton = document.querySelector(".predict-button"); // 예측하기 버튼
@@ -14,18 +12,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     let chartInstance = null; // 차트 인스턴스 저장 변수
     let predict_data = null;
     let max_book = 0;
+    const selectedLocation = '전체';
 
-    // 드롭다운 기본값을 4층인문으로 설정
-    locationSelect.value = "4층인문";
-
-    // 시작 시 loadData 실행 (초기 데이터 로드)
-    await loadData(locationSelect.value);
-
-    // 드롭다운 값이 변경될 때 content-tab 업데이트 및 데이터 로드
-    locationSelect.addEventListener("change", async function () {
-        contentTab.textContent = locationSelect.value;
-        await loadData(locationSelect.value);
-    });
+    await loadData(selectedLocation);
 
     // 도서 수량 입력 시 자동으로 천 단위 콤마 추가
     bookNumInput.addEventListener("input", function (event) {
@@ -48,22 +37,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     detailsButton.addEventListener("click", async function () {
         try {
-            const selectedLocation = locationSelect.value;
             await fetch(SAVEBOOKDATA, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie("csrftoken"),
                 },
-                body: JSON.stringify({ book: predict_data, location: selectedLocation })
+                body: JSON.stringify({ book: predict_data, location: selectedLocation})
             }).then(response => response.json())  // 응답을 JSON으로 변환
             .then(data => {
-                
                 // 서버에서 응답을 받은 후 이동
                 if (data.success) {
-                    setTimeout(() => {
-                        location.href = MOVEDETAIL;
-                    }, 500);  // 0.5초 딜레이 추가 (세션 저장 안정화)
+                    location.href = MOVEDETAIL;
                 } else {
                 }
             })
@@ -75,7 +60,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // "예측하기" 버튼 클릭 시 "자세히 보기" 버튼 활성화 & 데이터 전송
     predictButton.addEventListener("click", async function () {
-        const selectedLocation = locationSelect.value;
         const bookQuantity = bookNumInput.value.replace(/,/g, ""); // 콤마 제거한 숫자 값
         const bookYear = bookYearInput.value;
 
@@ -94,12 +78,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
+        
         const requestData = {
             location: selectedLocation,
             quantity: bookQuantity,
             year: bookYear
         };
-
+        
         try {
             const response = await fetchWithLoading(PREDICT_BOOK, {
                 method: "POST",

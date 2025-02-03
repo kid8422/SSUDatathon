@@ -143,16 +143,6 @@ body {
 }
 
 .option-img {
-    width: 15%; /* 부모 대비 아이콘 크기 */
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 5%; /* 아이콘-텍스트 간격 */
-    margin-right: 5%; /* 아이콘-텍스트 간격 */
-}
-
-.option-img {
     width: 20%; /* 부모 대비 아이콘 크기 */
     height: 100%;
     display: flex;
@@ -327,6 +317,8 @@ body {
 
     display: flex;          /* 버튼 우측 정렬 위해 flex 사용 */
     flex-direction: column; /* 항목을 수직으로 쌓음 */
+
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* -------- (2) 스크롤바 디자인 -------- */
@@ -559,6 +551,7 @@ body {
     display: flex;
     gap: 0.5vh;
     z-index: 999;
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* 화살표 아이콘 (SVG) */

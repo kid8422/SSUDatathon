@@ -25,60 +25,86 @@
   </head>
 
   <body>
-    <div class="init">
-      <div class="div">
-        <!-- 오른쪽 파란색 영역 -->
-        <div class="overlap">
-          <!-- 팀명 / 제목 -->
-          <div class="HARD-CODING">
-            HARD<br />CODING
+    <div class="main">
+        <div class="information-container">
+          <div class="information-box">
+            <div class="information-table">
+                <div class="text-location">4층인문</div>
+                <div class="text-count">{{ f4_count|intcomma }} 권</div>
+            </div>
+            <div class="information-table">
+                <div class="text-location">보존서고</div>
+                <div class="text-count">{{ b1_count|intcomma }} 권</div>
+            </div>
           </div>
-
-          <!-- 로그인 폼: HARD CODING 바로 아래 배치 -->
+          <div class="chart-container">
+            <div class="chart-info">
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="000">000</span>
+                <div class="chart-info-text">&nbsp;&nbsp;총류</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="100">100</span>
+                <div class="chart-info-text">&nbsp;&nbsp;철학</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="200">200</span>
+                <div class="chart-info-text">&nbsp;&nbsp;종교</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="300">300</span>
+                <div class="chart-info-text">&nbsp;&nbsp;사회과학</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="400">400</span>
+                <div class="chart-info-text">&nbsp;&nbsp;자연과학</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="500">500</span>
+                <div class="chart-info-text">&nbsp;&nbsp;기술과학</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="600">600</span>
+                <div class="chart-info-text">&nbsp;&nbsp;예술</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="700">700</span>
+                <div class="chart-info-text">&nbsp;&nbsp;언어</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="800">800</span>
+                <div class="chart-info-text">&nbsp;&nbsp;문학</div>
+              </div>
+              <div class="chart-info-text-box">
+                <span class="square-tag" data-code="900">900</span>
+                <div class="chart-info-text">&nbsp;&nbsp;역사</div>
+              </div>
+            </div>
+            <div class="chart-box">
+              <canvas class="myChart" id="myChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="login-container">
+          <div class="login-title">
+            Big<br />Book<br />Brother
+          </div>
           <div class="login-form">
-            <h2 class="text-3xl font-bold mb-6 text-white">Login</h2>
+            <h2 class="login-text">Login</h2>
             <form method="POST">
               {% csrf_token %}
               <div class="form-field">
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  required
-                  autocomplete="off"
-                  placeholder=""
-                />
+                <input type="text" id="username" name="username" required autocomplete="off"  placeholder=""/>
                 <label for="username">Username</label>
               </div>
               <div class="form-field">
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  required
-                  autocomplete="off"
-                  placeholder=""
-                />
+                <input type="password" id="password" name="password" required autocomplete="off" placeholder=""/>
                 <label for="password">Password</label>
               </div>
               <div class="text-right mt-4">
-                <button
-                  type="submit"
-                  class="inline-flex items-center px-4 py-2 bg-black text-white rounded shadow"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    />
+                <button type="submit" class="login-btn" >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
                   Login
                 </button>
@@ -86,42 +112,6 @@
             </form>
           </div>
         </div>
-
-        <!-- 기존 네모박스 (보존서고 / 4층 인문) -->
-        <div class="element-3">
-          <div class="overlap-group-3 box-wrapper">
-            <div class="text-wrapper-6">4층 인문</div>
-            <div class="text-wrapper-7">{{ f4_count|intcomma }} 권</div>
-          </div>
-        </div>
-        <div class="div-wrapper">
-          <div class="overlap-group-3 box-wrapper">
-            <div class="text-wrapper-8">보존서고</div>
-            <div class="text-wrapper-9">{{ b1_count|intcomma }} 권</div>
-          </div>
-        </div>
-
-        <!-- 코드 리스트 & 파이차트 -->
-        <div class="group-3">
-          <!-- 코드 리스트 -->
-          <div class="code-list">
-            <div class="element-10"><span class="square-tag" data-code="000">000</span>&nbsp;&nbsp;총류</div>
-            <div class="element-10"><span class="square-tag" data-code="100">100</span>&nbsp;&nbsp;철학</div>
-            <div class="element-13"><span class="square-tag" data-code="200">200</span>&nbsp;&nbsp;종교</div>
-            <div class="element-12"><span class="square-tag" data-code="300">300</span>&nbsp;&nbsp;사회과학</div>
-            <div class="element-5"><span class="square-tag" data-code="400">400</span>&nbsp;&nbsp;자연과학</div>
-            <div class="element-11"><span class="square-tag" data-code="500">500</span>&nbsp;&nbsp;기술과학</div>
-            <div class="element-6"><span class="square-tag" data-code="600">600</span>&nbsp;&nbsp;예술</div>
-            <div class="element-7"><span class="square-tag" data-code="700">700</span>&nbsp;&nbsp;언어</div>
-            <div class="element-8"><span class="square-tag" data-code="800">800</span>&nbsp;&nbsp;문학</div>
-            <div class="element-9"><span class="square-tag" data-code="900">900</span>&nbsp;&nbsp;역사</div>
-          </div>
-          <!-- 파이차트: Chart.js를 사용할 Canvas -->
-          <div class="piechart-area">
-            <canvas id="myChart" width="450" height="450"></canvas>
-          </div>
-        </div>
-      </div>
     </div>
   </body>
 </html>

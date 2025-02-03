@@ -1,17 +1,17 @@
-<!-- 예측 - 데이터 전처리 -->
+<!-- 데이터 관리 - 데이터 전처리 -->
 {% extends 'main/base.html' %}
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'main/css/preprocessing_predict.css' %}">
-<script src="{% static 'main/js/preprocessing_predict.js' %}"></script>
+<link rel="stylesheet" href="{% static 'main/css/preprocessing_set.css' %}">
+<script src="{% static 'main/js/preprocessing_set.js' %}"></script>
 <script>
     const LOAD_DATA = "{% url 'load_db_update' %}";
     const PREPROCESSING_DATA = "{% url 'preprocessing_db' %}";
 </script>
 {% endblock %}
 
-{% block title %}예측 - 데이터 전처리{% endblock %}
+{% block title %}데이터 관리 - 데이터 전처리{% endblock %}
 
 {% block content %}
 <div class="container">

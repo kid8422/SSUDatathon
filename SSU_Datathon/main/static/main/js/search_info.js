@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             showSuggestions(data.suggestions);
         } catch (error) {
-            console.error('Error fetching suggestions:', error);
         }
     }
 
@@ -107,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     
             const data = await response.json();
-            console.log("SEARCH_BOOK 결과:", data);
     
             // 실패 시 기본 메시지 표시
             if (!data.success) {
@@ -128,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPagination();
     
         } catch (error) {
-            console.error("searchBooks 오류:", error);
             noDataWrapper.style.display = "block";
             iconBox.style.display = "block"; // 아이콘이 표시되도록 설정
             noDataText.style.display = "block"; // "도서정보를 찾을 수 없습니다" 텍스트 표시
@@ -137,8 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadTableData() {
-        console.log("Load data -> page:", currentPage, "pageSize:", 25);
-    
         try {
             const res = await fetchWithLoading(LOADBOOK, {
                 method: "POST",
@@ -151,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
             const json = await res.json();
             const results = json.data || [];
-            console.log("LOADBOOK 결과:", results);
 
             if (results.length === 0) {
                 showNoDataMessage();
@@ -165,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showTable(); // 📌 **검색 결과가 있으면 테이블 표시**
     
         } catch (err) {
-            console.error("loadTableData 오류:", err);
             showNoDataMessage();
         }
     }

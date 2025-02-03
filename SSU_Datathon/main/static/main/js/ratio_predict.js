@@ -57,8 +57,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             quantity: bookQuantity,
         };
 
-        console.log(requestData);
-
         try {
             const response = await fetchWithLoading(SETTINGRATIO, {
                 method: "POST",
@@ -72,8 +70,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             const result = await response.json();
             locationData = JSON.parse(result.location);
             ratioData = JSON.parse(result.setting);
-            console.log(locationData);
-            console.log(ratioData);
 
             if (locationData && locationData.length === 10) {
                 drawHorizontalBarChart(locationData, ratioData);

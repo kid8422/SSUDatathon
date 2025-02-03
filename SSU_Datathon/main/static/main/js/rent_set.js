@@ -6,13 +6,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let pageSize = 25;   // 기본값
     let maxPages = 5; // 기본값 (임시 1)
     let order = 1;
+    let importRows = null;
 
     try {
         // 초기 pageSize=25에 대한 최대 페이지 수 로딩
         maxPages = await load_max_page_len(pageSize);
-        console.log("최대 페이지 수:", maxPages);
     } catch (error) {
-        console.error("최대 페이지 수 로드 오류:", error);
     }
     
     async function updateMaxPageAndReload() {
@@ -21,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentPage = 1;
             loadTableData();
         } catch (err) {
-            console.error("update max page error:", err);
         }
     }
 
@@ -288,7 +286,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         테이블 데이터 로드
     ================================ */
     async function loadTableData() {
-        console.log("Load data -> page:", currentPage, "pageSize:", pageSize);
         try {
             const res = await fetchWithLoading(LOADRENTDATA, {
                 method: "POST",
@@ -303,7 +300,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTable(results);
             renderPagination();
         } catch (err) {
-            console.error("loadTableData error:", err);
         }
     }
 
@@ -318,11 +314,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({ pageSize: pageSize }),
             });
             const data = await response.json();
-            // data.data 에 최대 페이지 수가 있다고 가정
-            console.log("load_max_page_len 응답:", data.data);
             return data.data; 
         } catch (error) {
-            console.error("최대 페이지 수 요청 오류:", error);
             return 1; // 오류 시 1
         }
     }
@@ -387,7 +380,76 @@ document.addEventListener('DOMContentLoaded', async () => {
       importModal.classList.remove('show');
       resetFileUpload();
     });
+    
     // saveBtnInImport 클릭 시 => 로직 추가 (ex: Ajax)
+    saveBtnInImport.addEventListener('click', async function () {
+        // 1️⃣ 파일이 선택되었는지 확인
+        if (!fileInput.files.length) {
+            alert("파일을 선택하세요.");
+            return;
+        }
+        const selectedFile = fileInput.files[0];
+
+        // 1) importRows가 존재하는지 확인
+        if (!importRows) {
+            alert("파일이 제대로 로드되지 않았습니다. 다시 시도하세요.");
+            return;
+        }
+
+        // 2) 각 <select>에서 선택된 값(열 정보) 가져오기
+        //    allSelects는 기존 코드에서 querySelectorAll('.column-select')로 얻은 배열
+        const selectedCols = [];
+        for (const selectElem of allSelects) {
+            const val = selectElem.value.trim();
+            if (!val) {
+                alert("모든 컬럼을 선택해야 합니다!");
+                return;
+            }
+            // 중복 검사
+            if (selectedCols.includes(val)) {
+                alert("각 컬럼은 중복 선택할 수 없습니다.");
+                return;
+            }
+            selectedCols.push(val);
+        }
+
+        const requestData = {
+            rows: importRows,
+            cols: selectedCols
+        };
+
+        try {
+            // 1️⃣ FormData 객체 생성
+            const formData = new FormData();
+
+            // 2️⃣ 파일 및 기타 데이터 추가
+            formData.append("file", selectedFile);  // 파일 추가
+            formData.append("extraData", JSON.stringify(requestData));
+
+            // 4) fetchWithLoading 전송 (URL은 예시 "/importData"로 가정)
+            const response = await fetchWithLoading(SAVERENTFILE, {
+                method: 'POST',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: formData
+                });
+            const result = await response.json();
+            
+            if (result.success) {
+                alert("데이터 가져오기 성공");
+                // 모달 닫기 or 추가 로직
+                updateMaxPageAndReload();
+                importModal.classList.remove('show');
+                resetFileUpload();
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+    });
+
   
     // 파일이 선택(또는 변경)될 때
     fileInput.addEventListener('change', handleFile);
@@ -427,11 +489,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   
         // rows[0] 는 첫 번째 행(배열). => 열 수
         if (rows.length > 0) {
-          const firstRow = rows[0];
-          const colCount = firstRow.length;
-  
-          // (2) 드롭다운 생성
-          createColumnOptions(colCount);
+            importRows = rows;
+            const firstRow = rows[0];
+            const colCount = firstRow.length;
+
+            // (2) 드롭다운 생성
+            createColumnOptions(colCount);
         }
       };
   
@@ -488,7 +551,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return data;
       }
       catch (error) {
-          console.error(error);
           return []; // 오류 발생 시 빈 배열 반환
       }
     }
@@ -498,7 +560,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveBtnInDownload.addEventListener('click', async function () {
       try {
           const data = await downloadrentData(); // 데이터를 변수에 저장
-          console.log(data)
 
           downloadModal.classList.remove('show');
           if (data.length > 0) {
@@ -537,7 +598,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
       }
       catch (error) {
-        console.error(error);
       }
     });
   });

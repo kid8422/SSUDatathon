@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const chartContainer = document.querySelector(".content-box");
     let chartInstance = null; // 차트 인스턴스 저장 변수
     let predict_data = null;
+    let max_book = 0;
     const selectedLocation = '보존서고';
 
     await loadData(selectedLocation);
@@ -45,20 +46,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 body: JSON.stringify({ book: predict_data, location: selectedLocation})
             }).then(response => response.json())  // 응답을 JSON으로 변환
             .then(data => {
-                console.log("✅ SAVEBOOKDATA 요청 완료", data);
                 
                 // 서버에서 응답을 받은 후 이동
                 if (data.success) {
                     location.href = MOVEDETAIL;
                 } else {
-                    console.error("❌ 서버 응답 실패", data);
                 }
             })
             .catch(error => {
-                console.error("❌ SAVEBOOKDATA 요청 실패:", error);
             });
         } catch (error) {
-            console.log("이동 중 오류 발생:", error);
         }
     });
 
@@ -69,6 +66,16 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (!bookQuantity || !bookYear) {
             alert("도서 수량과 데이터 연도를 입력해주세요.");
+            return;
+        }
+
+        if (bookQuantity < 1 || bookQuantity > max_book) {
+            alert("도서 수량의 범위를 벗어났습니다. 다시 입력해 주세요.");
+            return
+        }
+
+        if (bookYear < 1) {
+            alert("데이터 연도를 1 이상 입력해주세요.");
             return;
         }
 
@@ -93,7 +100,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             actualData = JSON.parse(result.actualData);
             parsedData = JSON.parse(result.data);
             predict_data = result.predict;
-            console.log(predict_data);
 
             if (parsedData && parsedData.length === 10) {
                 drawHorizontalBarChart(actualData, parsedData);
@@ -124,6 +130,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             if (parsedData && parsedData.length === 10) {
                 drawHorizontalBarChart(parsedData);
+                max_book = parsedData.reduce((acc, num) => acc + num, 0);
             } else {
                 showNoData();
             }

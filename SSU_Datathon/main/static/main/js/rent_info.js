@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const stabTabs = document.querySelectorAll(".select-tab"); // Stab 탭 선택
     let chartInstance = null; // 차트 인스턴스 저장 변수
     let activeSelection = "연도선택"; // 현재 활성화된 선택 (연도선택 또는 분류선택)
+    let year_list = YEARSLIST;
 
     // **선택 상태를 저장할 변수 추가**
     let selectedYears = []; // 연도 선택 탭에서 선택된 연도들
@@ -116,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-        for (let year = 2024; year >= 2004; year--) {
+        for (let year of year_list) {
             const isChecked = selectedYears.includes(String(year));
             optionsGrid.innerHTML += `
                 <div class="option">

@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // 데이터가 하나라도 있는 경우
         if (checkedOptions.length !== 0) {
-            console.log(checkedOptions);
             await dataPreprocessing(checkedOptions);
         }
     });

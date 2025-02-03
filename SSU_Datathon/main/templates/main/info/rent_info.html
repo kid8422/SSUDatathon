@@ -9,6 +9,7 @@
 <script>
     const BAR_ICON = "{% static 'main/images/bar.svg' %}";
     const LOAD_DATA = "{% url 'load_rent_info' %}";
+    const YEARSLIST = JSON.parse('{{ years|escapejs }}');
 </script>
 {% endblock %}
 

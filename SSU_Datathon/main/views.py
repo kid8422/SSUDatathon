@@ -41,15 +41,27 @@ def DB_login(request):
     # 데이터베이스에서 B1 및 4F 데이터를 가져옵니다.
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM large_classification WHERE TAG = '4층인문'")
-        raw_data = cursor.fetchall()[0]
+        raw = cursor.fetchall()
+        if len(raw) != 0:
+            raw_data = raw[0]
+        else:
+            raw_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
         f4_count = sum(raw_data[1:])
 
         cursor.execute("SELECT * FROM large_classification WHERE TAG = '보존서고'")
-        raw_data = cursor.fetchall()[0]
+        raw = cursor.fetchall()
+        if len(raw) != 0:
+            raw_data = raw[0]
+        else:
+            raw_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
         b1_count = sum(raw_data[1:])
 
         cursor.execute("SELECT * FROM large_classification WHERE TAG = '전체'")
-        raw_data = cursor.fetchall()[0]
+        raw = cursor.fetchall()
+        if len(raw) != 0:
+            raw_data = raw[0]
+        else:
+            raw_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
         range_list = list(raw_data[1:])
         range_json = json.dumps(range_list)
 
@@ -73,7 +85,11 @@ def book_info(request):
 
 @login_required(login_url='DB_login')
 def rent_info(request):
-    return render(request, 'main/info/rent_info.html')
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT year FROM year_month_count")
+        raw = cursor.fetchall()
+    years = sorted([_[0] for _ in raw], reverse = True)
+    return render(request, 'main/info/rent_info.html', {'years': years})
 
 @login_required(login_url='DB_login')
 def search(request):
@@ -92,6 +108,10 @@ def DB_except(request):
     return render(request, 'main/set/except_set.html')
 
 @login_required(login_url='DB_login')
+def DB_preprocessing(request):
+    return render(request, 'main/set/preprocessing_set.html')
+
+@login_required(login_url='DB_login')
 def predict_f4(request):
     return render(request, 'main/predict/f4_predict.html')
 
@@ -100,12 +120,12 @@ def predict_b1(request):
     return render(request, 'main/predict/b1_predict.html')
 
 @login_required(login_url='DB_login')
-def ratio_setting(request):
-    return render(request, 'main/predict/ratio_predict.html')
+def use_predict(request):
+    return render(request, 'main/predict/use_predict.html')
 
 @login_required(login_url='DB_login')
-def DB_preprocessing(request):
-    return render(request, 'main/predict/preprocessing_predict.html')
+def ratio_setting(request):
+    return render(request, 'main/predict/ratio_predict.html')
 
 @login_required(login_url='DB_login')
 def dev_info(request):
@@ -176,8 +196,6 @@ def load_rent_info(request):
                         raw_data = cursor.fetchall()
                         raw_data_list.append(raw_data)
                         summed_values = [sum(values) for values in zip(*[map(lambda x: x[0], row) for row in raw_data_list])]
-            
-            print(summed_values)
             value_json = json.dumps(summed_values)
 
             return JsonResponse({'success': True, 'data': value_json})

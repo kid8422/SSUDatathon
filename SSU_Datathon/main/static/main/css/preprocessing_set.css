@@ -147,6 +147,7 @@ body {
     border-top: none;
     border-left: none; 
     user-select: none; /* 선택 비활성화 */
+    background-color: #FFF;
 }
 
 .select-header {
