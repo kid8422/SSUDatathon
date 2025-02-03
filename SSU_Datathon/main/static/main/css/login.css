@@ -52,7 +52,7 @@ a {
   /* 로그인 폼이 바로 뒤따라오도록 하단 여백은 최소화 */
   margin-top: 12%;
   margin-bottom: 12%; 
-  text-align: center;
+  text-align: left;
 }
 
 /* 로그인 폼 래퍼: HARD CODING 바로 아래 */
