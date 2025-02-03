@@ -391,6 +391,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // saveBtnInImport 클릭 시 => 로직 추가 (ex: Ajax)
     saveBtnInImport.addEventListener('click', async function () {
+        // 1️⃣ 파일이 선택되었는지 확인
+        if (!fileInput.files.length) {
+            alert("파일을 선택하세요.");
+            return;
+        }
+        const selectedFile = fileInput.files[0];
+
         // 1) importRows가 존재하는지 확인
         if (!importRows) {
             alert("파일이 제대로 로드되지 않았습니다. 다시 시도하세요.");
@@ -420,14 +427,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
+            // 1️⃣ FormData 객체 생성
+            const formData = new FormData();
+
+            // 2️⃣ 파일 및 기타 데이터 추가
+            formData.append("file", selectedFile);  // 파일 추가
+            formData.append("extraData", JSON.stringify(requestData));
+
             // 4) fetchWithLoading 전송 (URL은 예시 "/importData"로 가정)
             const response = await fetchWithLoading(SAVEBOOKFILE, {
                 method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
                     "X-CSRFToken": getCookie("csrftoken")
                 },
-                body: JSON.stringify(requestData)
+                body: formData
                 });
             const result = await response.json();
             
@@ -470,28 +483,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         // FileReader를 이용하여 파일 읽기 (ArrayBuffer)
         const reader = new FileReader();
         reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-  
-        // SheetJS로 workbook 생성
-        const workbook = XLSX.read(data, { type: 'array' });
-  
-        // 첫 번째 시트만 사용
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-  
-        // sheet_to_json, header: 1 -> 2차원 배열 형태 ([ [행1], [행2], ... ])
-        const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  
-        // rows[0] 는 첫 번째 행(배열). => 열 수
-        if (rows.length > 0) {
-            importRows = rows;
-            const firstRow = rows[0];
-            const colCount = firstRow.length;
-  
-            // (2) 드롭다운 생성
-            createColumnOptions(colCount);
-        }
-      };
+            const data = new Uint8Array(e.target.result);
+    
+            // SheetJS로 workbook 생성
+            const workbook = XLSX.read(data, { type: 'array' });
+    
+            // 첫 번째 시트만 사용
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+    
+            // sheet_to_json, header: 1 -> 2차원 배열 형태 ([ [행1], [행2], ... ])
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+            // rows[0] 는 첫 번째 행(배열). => 열 수
+            if (rows.length > 0) {
+                importRows = rows;
+                const firstRow = rows[0];
+                const colCount = firstRow.length;
+    
+                // (2) 드롭다운 생성
+                createColumnOptions(colCount);
+            }
+        };
   
       // reader가 arraybuffer로 읽어오도록 지정
       reader.readAsArrayBuffer(file);
