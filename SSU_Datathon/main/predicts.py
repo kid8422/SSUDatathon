@@ -267,7 +267,6 @@ def save_book_data(request):
 def move_detail(request):
     book = request.session.get('book_data', {})  # 세션에서 가져오기
     location = request.session.get('location', {})  # 세션에서 가져오기
-    print(location)
     book_json = json.dumps(book)
     return render(request, 'main/predict/detail_predict.html', {
         'book': book_json,
@@ -414,35 +413,32 @@ def predict_book_b1(request):
             result_df['예측 결과'] = term_y_pred
             result_df_sorted = result_df.sort_values(by='예측 결과', ascending=False).reset_index(drop=True) # 오름차순
             
-            try:
-                # 현재 있는 권수 불러오기
-                with connection.cursor() as cursor:
-                    cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
-                    raw_data = cursor.fetchone()
-                    location_list = [int(x) for x in raw_data[1:]]
-                    location_book = {str(index): value for index, value in enumerate(location_list)}
+            # 현재 있는 권수 불러오기
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT * FROM large_classification WHERE TAG = '{location}'")
+                raw_data = cursor.fetchone()
+                location_list = [int(x) for x in raw_data[1:]]
+                location_book = {str(index): value for index, value in enumerate(location_list)}
 
-                # 옮길 수 있는 권 수 계산
-                move_max = {key: location_book[key] for key in location_book}
-                
-                # 이동 가능한 수량만큼 추출
-                move_book_list, unavaliable_list = extract_movable_books_sorted(result_df_sorted, move_max, quantity)
-                
-                large_code_counts = move_book_list.groupby("대분류").size().to_dict()
-                for i in range(10):
-                    large_code_counts.setdefault(str(i), 0)  # 문자열 키로 변환하여 0으로 기본값 설정
-                actual_list = [location_book[str(i)] for i in range(len(location_book))]
-                difference_list = [location_book[str(i)] - large_code_counts[str(i)] for i in range(len(large_code_counts))]
-                actual_list_json = json.dumps(actual_list)
-                result_data_json = json.dumps(difference_list)
+            # 옮길 수 있는 권 수 계산
+            move_max = {key: location_book[key] for key in location_book}
+            
+            # 이동 가능한 수량만큼 추출
+            move_book_list, unavaliable_list = extract_movable_books_sorted(result_df_sorted, move_max, quantity)
+            
+            large_code_counts = move_book_list.groupby("대분류").size().to_dict()
+            for i in range(10):
+                large_code_counts.setdefault(str(i), 0)  # 문자열 키로 변환하여 0으로 기본값 설정
+            actual_list = [location_book[str(i)] for i in range(len(location_book))]
+            difference_list = [location_book[str(i)] - large_code_counts[str(i)] for i in range(len(large_code_counts))]
+            actual_list_json = json.dumps(actual_list)
+            result_data_json = json.dumps(difference_list)
 
-                move_book_list2 = move_book_list.copy()
-                move_book_list2["예측 결과"] = move_book_list2["예측 결과"].apply(lambda x: round(x, 3))
-                move_book_list2.drop(columns=['대분류'], inplace=True)
+            move_book_list2 = move_book_list.copy()
+            move_book_list2["예측 결과"] = move_book_list2["예측 결과"].apply(lambda x: round(x, 3))
+            move_book_list2.drop(columns=['대분류'], inplace=True)
 
-                predict_df_tuples = list(move_book_list2.itertuples(index=False, name=None))
-            except Exception as e:
-                print(e)
+            predict_df_tuples = list(move_book_list2.itertuples(index=False, name=None))
             
             return JsonResponse({'success': True, 'actualData': actual_list_json, 'data': result_data_json, 'predict' : predict_df_tuples})
         except Exception as e:
@@ -467,7 +463,6 @@ def setting_ratio(request):
             raw_data = cursor.fetchone()
             value_list = raw_data[1:]
             max_dict = dict(zip(keys, value_list))
-            print(max_dict)
 
         with connection.cursor() as cursor:
             if DDC == '전체':
@@ -634,7 +629,6 @@ def predict_book_use(request):
             
             return JsonResponse({'success': True, 'actualData': actual_list_json, 'data': result_data_json, 'predict' : predict_df_tuples})
         except Exception as e:
-            print(e)
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
 
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)

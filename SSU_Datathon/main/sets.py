@@ -54,7 +54,6 @@ def load_book_data(request):
             page = int(data.get('page', 1))  # 선택된 데이터 가져오기
             pageSize = int(data.get('pageSize', 25))
             start = (page - 1) * pageSize
-            #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
             with connection.cursor() as cursor:
                 cursor.execute(f"SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location, `except` FROM book LIMIT {pageSize} OFFSET {start}")
                 book_data = cursor.fetchall()
@@ -80,7 +79,6 @@ def load_book_max_page_len(request):
 
 def data_check(data):
     if not re.match(r'^SS_\d{6}$', data['bookId']):
-        print(repr(data['bookId']))  # 문자열 내부를 그대로 출력
         return "도서ID는 'SS_'로 시작하고 6개의 숫자로 구성되어야 합니다."
     
     try:
@@ -89,7 +87,6 @@ def data_check(data):
         return "등록일자는 'YYYY-MM-DD' 형식의 날짜여야 합니다."
     
     if not re.match(r'^\d{3}(\.\d+)?$', data['ddc']):
-        print(repr(data['ddc']))  # 문자열 내부를 그대로 출력
         return "분류코드는 세 자리 숫자 또는 세 자리 숫자 뒤에 '.'과 숫자가 오는 형식이어야 합니다."
     
     if not re.match(r'^\d{4}$', data['pubYear']):
@@ -181,7 +178,6 @@ def save_add_book(request):
             stat = data_check(body)
             if stat == "문제없음":
                 data = data_preprocess(body)
-                print(f"""({data["ID"]}, {data["registration_year"]},{data["registration_month"]}, {data["get_course"]}, {data["DDC"]}, {data["ISBN"]}, {data["title"]}, {data["author"]}, {data["publisher"]}, {data["publication_year"]}, {data["location"]}, {data["large_code"]}, {data["middle_code"]}, {data["jaum"]}, {data["bulli"]}, {data["registration"]}, {data["except"]})""")
                 try:
                     with connection.cursor() as cursor:
                         cursor.execute("""
@@ -194,7 +190,6 @@ def save_add_book(request):
                 except Exception as e:
                     if e.args[0] == 1062:  # MySQL 에러 코드 1062 (Duplicate entry)
                         return JsonResponse({'success': False, 'message': "이미 존재하는 도서ID입니다."}, status=400)
-                    print(f"Error: {e}")
             else:
                 return JsonResponse({'success': False, 'message': stat}, status=400)
         except Exception as e:
@@ -296,7 +291,6 @@ def save_book_file(request):
                     return JsonResponse({'success': True})
                 except Exception as e:
                     connection.rollback()  # 오류 발생 시 롤백
-                    print(f"Error: {e}")
                     if e.args[0] == 1062:  # MySQL 에러 코드 1062 (Duplicate entry)
                         duplicate_id = e.args[1].split("'")[1]  # "SS_000001" 추출
                         return JsonResponse({'success': False, 'message': f"'{duplicate_id}'은 이미 존재하는 도서ID입니다."}, status=400)
@@ -319,7 +313,6 @@ def edit_book(request):
             stat = data_check(body)
             if stat == "문제없음":
                 data = data_preprocess(body)
-                print(f"""({data["ID"]}, {data["registration_year"]},{data["registration_month"]}, {data["get_course"]}, {data["DDC"]}, {data["ISBN"]}, {data["title"]}, {data["author"]}, {data["publisher"]}, {data["publication_year"]}, {data["location"]}, {data["large_code"]}, {data["middle_code"]}, {data["jaum"]}, {data["bulli"]}, {data["registration"]}, {data["except"]})""")
                 try:
                     with connection.cursor() as cursor:
                         cursor.execute("""
@@ -332,7 +325,6 @@ def edit_book(request):
                 except Exception as e:
                     if e.args[0] == 1062:  # MySQL 에러 코드 1062 (Duplicate entry)
                         return JsonResponse({'success': False, 'message': "이미 존재하는 도서ID입니다."}, status=400)
-                    print(f"Error: {e}")
             else:
                 return JsonResponse({'success': False, 'message': stat}, status=400)
         except Exception as e:
@@ -352,7 +344,6 @@ def download_rent_data(request):
 
             keys = ["도서ID", "대출일시"]
             transformed_data = [dict(zip(keys, row)) for row in book_data]
-            print(transformed_data)
             return JsonResponse({'success': True, 'data': transformed_data})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
@@ -371,7 +362,6 @@ def load_rent_data(request):
             else:
                 order_by = "ASC"
             start = (page - 1) * pageSize
-            #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
             with connection.cursor() as cursor:
                 cursor.execute(f"SELECT rent_time, ID, title, author, publisher, DDC, location FROM rent_info ORDER BY rent_time {order_by} LIMIT {pageSize} OFFSET {start}")
                 rent_data = cursor.fetchall()
@@ -485,7 +475,6 @@ def save_rent_file(request):
                 return JsonResponse({'success': True})
             except Exception as e:
                 connection.rollback()  # 오류 발생 시 롤백
-                print(f"Error: {e}")
                 if e.args[0] == 1062:  # MySQL 에러 코드 1062 (Duplicate entry)
                     duplicate_id = e.args[1].split("'")[1]  # "SS_000001" 추출
                     return JsonResponse({'success': False, 'message': f"'{duplicate_id}'은 이미 존재하는 도서ID입니다."}, status=400)
@@ -521,7 +510,6 @@ def except_load_book_data(request):
             page = int(data.get('page', 1))  # 선택된 데이터 가져오기
             pageSize = int(data.get('pageSize', 25))
             start = (page - 1) * pageSize
-            #print(f"page : {page}, pageSize : {pageSize}, start : {start}")
             with connection.cursor() as cursor:
                 cursor.execute(f"SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location, `except` FROM book WHERE `except` = '1' LIMIT {pageSize} OFFSET {start}")
                 book_data = cursor.fetchall()
@@ -539,7 +527,6 @@ def except_load_book_max_page_len(request):
             with connection.cursor() as cursor:
                 cursor.execute(f"SELECT count(*) FROM book WHERE `except` = '1'")
                 book_data = cursor.fetchone()[0]
-            print(book_data)
             return JsonResponse({'success': True, 'data': math.ceil(book_data / pageSize)})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
@@ -580,7 +567,6 @@ def save_except_book_file(request):
                     return JsonResponse({'success': True})
                 except Exception as e:
                     connection.rollback()  # 오류 발생 시 롤백
-                    print(f"Error: {e}")
                     if e.args[0] == 1062:  # MySQL 에러 코드 1062 (Duplicate entry)
                         duplicate_id = e.args[1].split("'")[1]  # "SS_000001" 추출
                         return JsonResponse({'success': False, 'message': f"'{duplicate_id}'은 이미 존재하는 도서ID입니다."}, status=400)

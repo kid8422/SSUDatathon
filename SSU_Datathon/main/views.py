@@ -196,8 +196,6 @@ def load_rent_info(request):
                         raw_data = cursor.fetchall()
                         raw_data_list.append(raw_data)
                         summed_values = [sum(values) for values in zip(*[map(lambda x: x[0], row) for row in raw_data_list])]
-            
-            print(summed_values)
             value_json = json.dumps(summed_values)
 
             return JsonResponse({'success': True, 'data': value_json})
