@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let pageSize = 25;   // 기본값
     let maxPages = 5; // 기본값 (임시 1)
     let order = 1;
+    let headers = [];
 
     try {
         // 초기 pageSize=25에 대한 최대 페이지 수 로딩 
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orderdropdownMenu = document.getElementById("orderDropdown");
     const currentorder = document.querySelector(".current-order");
 
-    currentorder.textContent = LOCATIONDATA === "보존서고" ? "내림차순" : "오름차순";
+    currentorder.textContent = (LOCATIONDATA === "보존서고" || LOCATIONDATA === "전체") ? "내림차순" : "오름차순";
 
     orderdropdownContainer.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -78,9 +79,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             orderdropdownMenu.classList.add("hidden");
             
             if (neworder === "오름차순") {
-                order = LOCATIONDATA === "보존서고" ? 0 : 1;  // 보존서고면 내림차순, 아니면 오름차순
+                order = (LOCATIONDATA === "보존서고" || LOCATIONDATA === "전체") ? 0 : 1;  // 보존서고면 내림차순, 아니면 오름차순
             } else if (neworder === "내림차순") {
-                order = LOCATIONDATA === "보존서고" ? 1 : 0;  // 보존서고면 오름차순, 아니면 내림차순
+                order = (LOCATIONDATA === "보존서고" || LOCATIONDATA === "전체") ? 1 : 0;  // 보존서고면 오름차순, 아니면 내림차순
             }
             currentPage = 1;
             // 페이지크기 변경 시 다시 maxPages 로드 -> 테이블 로드
@@ -216,7 +217,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========== 1) 테이블 헤더 (동적) ==========
     function createTableHeader() {
         /* 예시: 열 이름 (문자열 배열) */
-        const headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","예측 결과"];
+        if (LOCATIONDATA !== "전체") {
+            headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","예측 결과"];
+        } else {
+            headers = ["ID","등록일자","수서방법","분류코드","ISBN","서명","저자","출판사","출판연도","소장위치","예측 결과"];
+        }
         
         // 한 줄(헤더 행) 생성
         const tr = document.createElement("tr");
@@ -342,11 +347,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const downloadModal = document.getElementById('downloadModal');
     const downloadModalClose = document.getElementById('downloadModalClose');
   
-    // (도서추가) 버튼 + 모달
-    const addBookBtn = document.getElementById('addBookBtn');
-    const addBookModal = document.getElementById('addBookModal');
-    const addBookModalClose = document.getElementById('addBookModalClose');
-  
     /* ================================
          내보내기 (download)
     ================================ */
@@ -364,7 +364,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               headers: {
                   'Content-Type': 'application/json',
                   'X-CSRFToken': getCookie("csrftoken"),
-              }
+              },
+              body: JSON.stringify({ location: LOCATIONDATA })
           });
           const rawdata = await response.json();
           const data = rawdata.data;

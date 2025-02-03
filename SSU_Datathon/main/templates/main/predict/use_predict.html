@@ -1,0 +1,74 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'main/css/f4_predict.css' %}">
+<script src="{% static 'main/js/use_predict.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const LARGE_ICON = "{% static 'main/images/bar.svg' %}";
+    const LOAD_DATA = "{% url 'load_book_info_predict' %}";
+    const PREDICT_BOOK = "{% url 'predict_book_use' %}";
+    const MOVEDETAIL = "{% url 'move_detail' %}";
+    const SAVEBOOKDATA = "{% url 'save_book_data' %}";
+</script>
+{% endblock %}
+
+{% block title %}도서 이동 예측 - 도서 이용 예측{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 도서현황 그래프 -->
+    <div class="content-container">
+        <div class="content-box">
+            <div class="tabs">
+                <div class="content-tab active">도서 이용</div>
+            </div>
+            <div class="icon-box">
+                <img src="{% static 'main/images/bar.svg' %}" alt="데이터 없음" class="icon">
+            </div>
+            <!-- 선택된 데이터 없음 -->
+            <div class="no-data" id="noDataText">선택된 데이터가 없습니다</div>
+            <div class="chart-container">
+                <canvas class="chart" id="myChart" style="display: none;"></canvas>
+                <div id="custom-legend"></div> <!-- 차트 옆에 범례 추가 -->
+            </div>
+        </div>
+
+        <!-- 선택창 -->
+        <div class="select-box">
+            <!-- 데이터 선택 -->
+            <div class="selection-box">
+                <div class="option-box">
+                    <div class="option-text">도서 위치</div>
+                </div>
+                <div class="location">
+                    <div class="location-text">전체</div>
+                </div>
+            </div>
+            <div class="selection-box">
+                <div class="option-box">
+                    <div class="option-text">도서 수량</div>
+                </div>
+                <input type="text" id="bookNum" class="text-input" placeholder="이용이 가장 많은 N권" autocomplete="off"/>
+            </div>
+            <div class="selection-box">
+                <div class="option-box">
+                    <div class="option-text">데이터 연도</div>
+                </div>
+                <input type="text" id="bookYear" class="text-input" placeholder="최근 N년간 데이터 사용" autocomplete="off"/>
+            </div>
+            <div class="selection-box">
+                <div class="option-box-btn predict-button">
+                    <div class="option-text">예측하기</div>
+                </div>
+            </div>
+            <div class="selection-box">
+                <div class="option-box-btn details-button">
+                    <div class="option-text">자세히 보기</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
