@@ -145,7 +145,7 @@ def predict_book_lib(request):
                 raw_data = cursor.fetchone()[0]
                 end_date = raw_data
 
-            years_range = range(end_date.year - year, end_date.year + 1)
+            years_range = range(end_date.year - year + 1, end_date.year + 1)
             rc_sum_str = " + ".join([f"SUM(rc.`{_}`)" for _ in years_range])
             irc_sum_str = " + ".join([f"SUM(irc.`{_}`)" for _ in years_range])
             sum_str = " + ".join([f"SUM(`{_}`)" for _ in years_range])
