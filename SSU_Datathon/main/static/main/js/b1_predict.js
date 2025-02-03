@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const chartContainer = document.querySelector(".content-box");
     let chartInstance = null; // 차트 인스턴스 저장 변수
     let predict_data = null;
+    let max_book = 0;
     const selectedLocation = '보존서고';
 
     await loadData(selectedLocation);
@@ -72,6 +73,16 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
+        if (bookQuantity < 1 || bookQuantity > max_book) {
+            alert("도서 수량의 범위를 벗어났습니다. 다시 입력해 주세요.");
+            return
+        }
+
+        if (bookYear < 1) {
+            alert("데이터 연도를 1 이상 입력해주세요.");
+            return;
+        }
+
         
         const requestData = {
             location: selectedLocation,
@@ -124,6 +135,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             if (parsedData && parsedData.length === 10) {
                 drawHorizontalBarChart(parsedData);
+                max_book = parsedData.reduce((acc, num) => acc + num, 0);
             } else {
                 showNoData();
             }
