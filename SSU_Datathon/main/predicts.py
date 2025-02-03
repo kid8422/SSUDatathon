@@ -14,7 +14,6 @@ import os
 import re
 import math
 import json
-from .models import Book
 from django.db.models import Q
 from dotenv import load_dotenv
 
