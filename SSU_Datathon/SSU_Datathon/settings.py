@@ -24,6 +24,16 @@ SESSION_COOKIE_SECURE = False  # True이면 HTTPS 환경에서만 작동
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
 
+# 기존보다 큰 값으로 설정 (예: 100MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
+
+# 요청 본문 크기도 늘리기 (100MB 예시)
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000000  # 폼 필드 개수 제한 증가
+
+# 파일 업로드 크기 제한 (예: 100MB)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
