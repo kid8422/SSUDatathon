@@ -19,6 +19,10 @@ urlpatterns = [
     path('ratio_setting/', views.ratio_setting, name='ratio_predict'),
     path('DB_preprocessing/', views.DB_preprocessing, name='DB_preprocessing'),
     path('load_book_info/', views.load_book_info, name='load_book_info'),
+    path('load_rent_info/', views.load_rent_info, name='load_rent_info'),
+    path('autocomplete/', views.autocomplete, name='autocomplete'),
+    path('book_search/', views.book_search, name='book_search'),
+    path('load_book_search/', views.load_book_search, name='load_book_search'),
     path('download_book_data/', sets.download_book_data, name='download_book_data'),
     path('load_book_data/', sets.load_book_data, name='load_book_data'),
     path('load_book_max_page_len/', sets.load_book_max_page_len, name='load_book_max_page_len'),
@@ -42,4 +46,6 @@ urlpatterns = [
     path('load_book_data_detail/', predicts.load_book_data, name='load_book_data_detail'),
     path('download_book_data_detail/', predicts.download_book_data, name='download_book_data_detail'),
     path('predict_book_b1/', predicts.predict_book_b1, name='predict_book_b1'),
+    path('setting_ratio/', predicts.setting_ratio, name='setting_ratio'),
+    path('load_ratio/', predicts.load_ratio, name='load_ratio'),
 ]

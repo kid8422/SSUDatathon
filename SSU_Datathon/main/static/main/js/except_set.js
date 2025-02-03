@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 수정하기 아이콘
             const editIconWrapper = document.createElement("div");
-            editIconWrapper.classList.add("option-img");
+            editIconWrapper.classList.add("option-img-edit");
 
             const editIcon = document.createElement("img");
             editIcon.src = WRENCH; // 이미지 경로

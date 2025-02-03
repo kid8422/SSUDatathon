@@ -1,11 +1,14 @@
 document.addEventListener("DOMContentLoaded", async function () {
 
+    // 도서 위치
     const locationSelect = document.getElementById("locationSelect");
-    const contentTab = document.querySelector(".content-tab");
-    const bookNumInput = document.getElementById("bookNum");
-    const bookYearInput = document.getElementById("bookYear");
-    const predictButton = document.querySelector(".predict-button"); // 예측하기 버튼
-    const detailsButton = document.querySelector(".details-button"); // 자세히 보기 버튼
+    // 도서 분류
+    const DDCSelect = document.getElementById("DDCSelect");
+    // 최소 수량
+    const limitNumInput = document.getElementById("limitNum");
+    // 설정하기
+    const settingButton = document.querySelector(".setting-button"); // 설정하기 버튼
+
     const icon = document.querySelector(".icon-box img");
     const noDataText = document.getElementById("noDataText");
     const chartCanvas = document.getElementById("myChart");
@@ -22,12 +25,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 드롭다운 값이 변경될 때 content-tab 업데이트 및 데이터 로드
     locationSelect.addEventListener("change", async function () {
-        contentTab.textContent = locationSelect.value;
         await loadData(locationSelect.value);
     });
 
     // 도서 수량 입력 시 자동으로 천 단위 콤마 추가
-    bookNumInput.addEventListener("input", function (event) {
+    limitNumInput.addEventListener("input", function (event) {
         let value = event.target.value.replace(/,/g, ""); // 기존 콤마 제거
         if (!isNaN(value) && value !== "") {
             event.target.value = Number(value).toLocaleString(); // 숫자를 천 단위로 포맷
@@ -35,66 +37,30 @@ document.addEventListener("DOMContentLoaded", async function () {
             event.target.value = ""; // 숫자가 아닌 값이면 지움
         }
     });
-
-    // 데이터 연도 입력 시 숫자가 아닌 값이면 자동 삭제
-    bookYearInput.addEventListener("input", function (event) {
-        let value = event.target.value.replace(/\D/g, ""); // 숫자가 아닌 문자 제거
-        event.target.value = value;
-    });
-
-    // "자세히 보기" 버튼 초기 비활성화
-    detailsButton.classList.add("disabled");
-
-    detailsButton.addEventListener("click", async function () {
-        try {
-            const selectedLocation = locationSelect.value;
-            await fetch(SAVEBOOKDATA, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie("csrftoken"),
-                },
-                body: JSON.stringify({ book: predict_data, location: selectedLocation })
-            }).then(response => response.json())  // 응답을 JSON으로 변환
-            .then(data => {
-                console.log("✅ SAVEBOOKDATA 요청 완료", data);
-                
-                // 서버에서 응답을 받은 후 이동
-                if (data.success) {
-                    setTimeout(() => {
-                        location.href = MOVEDETAIL;
-                    }, 500);  // 0.5초 딜레이 추가 (세션 저장 안정화)
-                } else {
-                    console.error("❌ 서버 응답 실패", data);
-                }
-            })
-            .catch(error => {
-                console.error("❌ SAVEBOOKDATA 요청 실패:", error);
-            });
-        } catch (error) {
-            console.log("이동 중 오류 발생:", error);
-        }
-    });
+    
 
     // "예측하기" 버튼 클릭 시 "자세히 보기" 버튼 활성화 & 데이터 전송
-    predictButton.addEventListener("click", async function () {
+    settingButton.addEventListener("click", async function () {
+        // 값 불러오기
         const selectedLocation = locationSelect.value;
-        const bookQuantity = bookNumInput.value.replace(/,/g, ""); // 콤마 제거한 숫자 값
-        const bookYear = bookYearInput.value;
+        const selectedDDC = DDCSelect.value;
+        const bookQuantity = limitNumInput.value.replace(/,/g, ""); // 콤마 제거한 숫자 값
 
-        if (!bookQuantity || !bookYear) {
-            alert("도서 수량과 데이터 연도를 입력해주세요.");
+        if (!bookQuantity) {
+            alert("최소 수량을 입력해주세요.");
             return;
         }
 
         const requestData = {
             location: selectedLocation,
+            DDC: selectedDDC,
             quantity: bookQuantity,
-            year: bookYear
         };
 
+        console.log(requestData);
+
         try {
-            const response = await fetchWithLoading(PREDICT_BOOK, {
+            const response = await fetchWithLoading(SETTINGRATIO, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,14 +70,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             const result = await response.json();
-            actualData = JSON.parse(result.actualData);
-            parsedData = JSON.parse(result.data);
-            predict_data = result.predict;
-            console.log(predict_data);
+            locationData = JSON.parse(result.location);
+            ratioData = JSON.parse(result.setting);
+            console.log(locationData);
+            console.log(ratioData);
 
-            if (parsedData && parsedData.length === 10) {
-                drawHorizontalBarChart(actualData, parsedData);
-                detailsButton.classList.remove("disabled"); // "자세히 보기" 버튼 활성화
+            if (locationData && locationData.length === 10) {
+                drawHorizontalBarChart(locationData, ratioData);
             } else {
                 showNoData();
             }
@@ -134,10 +99,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             const result = await response.json();
-            parsedData = JSON.parse(result.data);
+            locationData = JSON.parse(result.location);
+            ratioData = JSON.parse(result.setting);
 
-            if (parsedData && parsedData.length === 10) {
-                drawHorizontalBarChart(parsedData);
+            if (locationData && locationData.length === 10) {
+                drawHorizontalBarChart(locationData, ratioData);
             } else {
                 showNoData();
             }

@@ -8,10 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const LARGE_ICON = "{% static 'main/images/bar.svg' %}";
-    const LOAD_DATA = "{% url 'load_book_info_predict' %}";
-    const PREDICT_BOOK = "{% url 'predict_book_lib' %}";
-    const MOVEDETAIL = "{% url 'move_detail' %}";
-    const SAVEBOOKDATA = "{% url 'save_book_data' %}";
+    const LOAD_DATA = "{% url 'load_ratio' %}";
+    const SETTINGRATIO = "{% url 'setting_ratio' %}";
 </script>
 {% endblock %}
 
@@ -23,7 +21,7 @@
     <div class="content-container">
         <div class="content-box">
             <div class="tabs">
-                <div class="content-tab active">4층인문</div>
+                <div class="content-tab active">분류별 최소치</div>
             </div>
             <div class="icon-box">
                 <img src="{% static 'main/images/bar.svg' %}" alt="데이터 없음" class="icon">
@@ -52,26 +50,36 @@
                     </select>
                 </div>
             </div>
+            <!-- 데이터 선택 -->
             <div class="selection-box">
                 <div class="option-box">
-                    <div class="option-text">도서 수량</div>
+                    <div class="option-text">도서 분류</div>
                 </div>
-                <input type="text" id="bookNum" class="text-input" placeholder="이동이 필요한 도서 수" />
+                <div class="dropdown-menu">
+                    <select id="DDCSelect" class="column-select">
+                        <option value="전체">전체</option>
+                        <option value="000">000</option>     
+                        <option value="100">100</option>     
+                        <option value="200">200</option>
+                        <option value="300">300</option>
+                        <option value="400">400</option>
+                        <option value="500">500</option>
+                        <option value="600">600</option>
+                        <option value="700">700</option>
+                        <option value="800">800</option>
+                        <option value="900">900</option>
+                    </select>
+                </div>
             </div>
             <div class="selection-box">
                 <div class="option-box">
-                    <div class="option-text">데이터 연도</div>
+                    <div class="option-text">최소 수량</div>
                 </div>
-                <input type="text" id="bookYear" class="text-input" placeholder="최근 N년간 데이터 사용" />
+                <input type="text" id="limitNum" class="text-input" placeholder="분류별 최소 수량" />
             </div>
             <div class="selection-box">
-                <div class="option-box-btn predict-button">
-                    <div class="option-text">예측하기</div>
-                </div>
-            </div>
-            <div class="selection-box">
-                <div class="option-box-btn details-button">
-                    <div class="option-text">자세히 보기</div>
+                <div class="option-box-btn setting-button">
+                    <div class="option-text">설정하기</div>
                 </div>
             </div>
         </div>

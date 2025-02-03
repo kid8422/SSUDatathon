@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // 이미지 경로 상수
-    const L_ICON = BAR_ICON;   // 대분류 이미지
 
     // UI 요소 선택
     const icon = document.querySelector(".icon-box img");
@@ -12,8 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const chartContainer = document.querySelector(".content-box");
     const stabTabs = document.querySelectorAll(".select-tab"); // Stab 탭 선택
     let chartInstance = null; // 차트 인스턴스 저장 변수
-    let selectedTab = "대분류"; // 기본 선택 탭
-    let storedData = { large: [], middle: [] }; // 데이터를 저장할 변수
     let activeSelection = "연도선택"; // 현재 활성화된 선택 (연도선택 또는 분류선택)
 
     // **선택 상태를 저장할 변수 추가**
@@ -31,9 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ---------------------------------------------
-    // [1] 이벤트 위임: optionsGrid에 change 이벤트 리스너 등록
-    // ---------------------------------------------
     optionsGrid.addEventListener("change", function (e) {
         const target = e.target;
 
@@ -77,9 +70,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ---------------------------------------------
-    // [2] "전체 선택" 체크박스에 따라 나머지 체크박스 전부 토글
-    // ---------------------------------------------
     function handleSelectAll(isChecked) {
         const allCheckboxes = optionsGrid.querySelectorAll(".checkbox:not(#optionAll)");
         allCheckboxes.forEach(cb => {
@@ -87,9 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ---------------------------------------------------------
-    // [3] 개별 체크박스 변경 시 "전체 선택" 체크박스 상태 동기화
-    // ---------------------------------------------------------
     function syncSelectAllCheckbox() {
         const allCheckboxes = optionsGrid.querySelectorAll(".checkbox:not(#optionAll)");
         const selectAll = optionsGrid.querySelector("#optionAll");
@@ -100,9 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
         selectAll.checked = allChecked;
     }
 
-    // ---------------------------------------------------------
-    // [4] Stab 탭 관련 이벤트
-    // ---------------------------------------------------------
     stabTabs.forEach(tab => {
         tab.addEventListener("click", function () {
             // 현재 활성 탭에서 선택 상태 저장 (이미 위의 change 이벤트에서 처리됨)
@@ -118,21 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 loadYearOptions(); // 연도 옵션 로드
             } else if (activeSelection === "분류선택") {
                 loadCategoryOptions(); // 분류 옵션 로드
-            }
-
-            // 탭 전환 시 저장된 데이터에 따라 차트 또는 표 표시
-            if (selectedTab === "대분류") {
-                if (storedData.large.length > 0) {
-                    drawBarChart(storedData.large);
-                } else {
-                    showNoData();
-                }
-            } else {
-                if (storedData.middle.length > 0) {
-                    drawTable(storedData.middle);
-                } else {
-                    showNoData();
-                }
             }
         });
     });
@@ -209,9 +178,6 @@ document.addEventListener("DOMContentLoaded", function () {
         ];
     }
 
-    // ---------------------------------------------
-    // [5] 확인 버튼 클릭 시 데이터 로드 및 차트/표 생성
-    // ---------------------------------------------
     confirmButton.addEventListener("click", async function () {
         // "연도선택"과 "분류선택" 모두의 선택 상태를 가져옴
         const checkedYears = selectedYears; // 연도 선택에서 선택된 연도들
@@ -223,15 +189,12 @@ document.addEventListener("DOMContentLoaded", function () {
             categories: checkedCategories
         };
 
-        console.log(allCheckedOptions);
-
         // 연도 선택과 분류 선택 중 하나라도 비어있을 경우 처리
         const isYearsEmpty = checkedYears.length === 0;
         const isCategoriesEmpty = checkedCategories.length === 0;
 
         if (isYearsEmpty && isCategoriesEmpty) {
             showNoData();
-            storedData = { large: [], middle: [] }; // 저장된 데이터 초기화
             return;
         }
 
@@ -239,9 +202,6 @@ document.addEventListener("DOMContentLoaded", function () {
         await loadData(allCheckedOptions);
     });
 
-    // ---------------------------------------------
-    // [6] 초기화 버튼 클릭 - 체크박스 및 화면 초기화
-    // ---------------------------------------------
     resetButton.addEventListener("click", function () {
         // 현재 활성화된 선택에 따라 초기화
         if (activeSelection === "연도선택") {
@@ -257,9 +217,6 @@ document.addEventListener("DOMContentLoaded", function () {
         storedData = { large: [], middle: [] };
     });
 
-    // ---------------------------------------------
-    // [7] 데이터 로드 및 저장 함수
-    // ---------------------------------------------
     async function loadData(selectedData) {
         try {
             const response = await fetchWithLoading(LOAD_DATA, {
@@ -272,34 +229,15 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const result = await response.json();
+            drawBarChart(result.data);
 
-            // 데이터 저장
-            storedData.large = result.large;
-            storedData.middle = result.middle;
-
-            // 선택된 탭에 따라 렌더링
-            if (selectedTab === "대분류") {
-                if (storedData.large.length > 0) {
-                    drawBarChart(storedData.large);
-                } else {
-                    showNoData();
-                }
-            } else {
-                if (storedData.middle.length > 0) {
-                    drawTable(storedData.middle);
-                } else {
-                    showNoData();
-                }
-            }
         } catch (error) {
             // 에러 시에도 '데이터 없음'으로 처리
             showNoData();
         }
     }
 
-    // ---------------------------------------------
-    // [8] 데이터가 없을 경우의 처리
-    // ---------------------------------------------
+    
     function showNoData() {
         noDataText.style.display = "block"; 
         chartCanvas.style.display = "none"; 
@@ -308,9 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
         chartContainer.querySelectorAll("table").forEach(el => el.remove());
     }
 
-    // ---------------------------------------------
-    // [9] 차트 생성 함수 (대분류용)
-    // ---------------------------------------------
+    
     function drawBarChart(data) {
         clearChartOrTable();
 
@@ -325,7 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
         chartInstance = new Chart(ctx, {
             type: "bar",
             data: {
-                labels: ["000", "100", "200", "300", "400", "500", "600", "700", "800", "900"],
+                labels: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
                 datasets: [
                     {
                         label: "대분류 데이터",
@@ -374,71 +310,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ---------------------------------------------
-    // [10] 표 생성 함수 (중분류용)
-    // ---------------------------------------------
-    function drawTable(data) {
-        clearChartOrTable();
-
-        const tableContainer = document.getElementById("myTable");
-        tableContainer.style.display = "block";
-        chartCanvas.style.display = "none";
-        icon.style.display = "none";
-        noDataText.style.display = "none";
-
-        const parsedData = JSON.parse(data);
-        const mapdata = parsedData.map(Number);
-
-        const table = document.createElement("table");
-        table.classList.add("data-table");
-
-        // 상단 헤더(가로 레이블)
-        const headerRow = document.createElement("tr");
-        headerRow.appendChild(document.createElement("th")); // 왼쪽 상단 공백
-        for (let col = 0; col < 10; col++) {
-            const headerCell = document.createElement("th");
-            headerCell.textContent = `${col * 100}`.padStart(3, "0");
-            headerCell.classList.add("header-cell");
-            headerRow.appendChild(headerCell);
-        }
-        table.appendChild(headerRow);
-
-        // 실제 데이터 행 생성
-        for (let row = 0; row < 10; row++) {
-            const tableRow = document.createElement("tr");
-
-            // 왼쪽 세로 레이블 (row * 10)
-            const rowHeader = document.createElement("th");
-            rowHeader.textContent = `${row * 10}`.padStart(3, "0");
-            rowHeader.classList.add("header-cell");
-            tableRow.appendChild(rowHeader);
-
-            for (let col = 0; col < 10; col++) {
-                const cell = document.createElement("td");
-                // (col * 10) + row 인덱스 위치의 값
-                cell.textContent = mapdata[(col * 10) + row] || 0;
-                cell.classList.add("table-cell");
-                tableRow.appendChild(cell);
-            }
-            table.appendChild(tableRow);
-        }
-
-        // 기존 표 제거 후 새 표 추가
-        tableContainer.innerHTML = "";
-        tableContainer.appendChild(table);
-    }
-
-    // ---------------------------------------------
-    // [11] 차트 / 표 초기화
-    // ---------------------------------------------
     function clearChartOrTable() {
         if (chartInstance) chartInstance.destroy();
         chartContainer.querySelectorAll("table").forEach(el => el.remove());
     }
 
-    // ---------------------------------------------
-    // [초기 구동] 연도 선택 또는 분류 선택에 따라 기본 옵션 로드
-    // ---------------------------------------------
     if (activeSelection === "연도선택") {
         loadYearOptions();
     } else if (activeSelection === "분류선택") {

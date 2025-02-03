@@ -45,6 +45,7 @@ body {
     position: relative;         /* 상대 위치 기준 */
     justify-content: center;     /* 가로 중앙 정렬 */
     align-items: center;         /* 세로 중앙 정렬 */
+    z-index: 1;
 }
 
 /* 탭 설정 */
@@ -82,10 +83,12 @@ body {
     align-items: center; /* 수직 중앙 정렬 */
     justify-content: flex-end; /* 오른쪽 정렬 */
     transform: translateY(-100%);
+    z-index: 1001;
 }
 
 /* Search Rectangle 스타일 */
 .search-rectangle {
+    position: relative;
     width: 100%; /* 부모의 너비에 맞춤 */
     height: 90%; /* 부모 컨테이너의 높이에 맞춤 (20vh) */
     background: white;
@@ -190,8 +193,99 @@ body {
     cursor: pointer;
 }
 
+.suggestions {
+    position: absolute;
+    top: 90%;
+    width: 100%;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    background: #FFF;
+    z-index: 2000;
+    display: none; /* 기본적으로 숨김 */
+}
 
+.suggestions ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: #FFF;
+}
 
+.suggestions li {
+    display: flex;
+    align-items: center;
+    gap: 1vw; /* 아이콘과 텍스트 간격 조정 */
+    padding: 1vh 1vw;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    background: #FFF;
+}
+
+.suggestions li:hover {
+    background-color: #f0f0f0;
+}
+
+/* 아이콘 스타일 */
+.suggestion-icon {
+    width: 1.2vw; /* 아이콘 크기 조절 */
+    height: 1.2vw;
+    filter: brightness(0); /* 아이콘 색상을 검정색으로 변환 */
+}
+
+/* 검색어 텍스트 스타일 */
+.suggestion-text {
+    font-size: 1.2vw;
+    color: #000; /* 검정색 텍스트 */
+}
+
+/* (2) 페이지네이션 하단 이동 */
+.pagination-container {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 95%); /* 수평 중앙 정렬 */
+    display: flex;
+    gap: 0.5vh;
+    z-index: 999;
+}
+
+/* 화살표 아이콘 (SVG) */
+.arrow-icon {
+    position: relative;
+    width: 4vh;
+    height: 4vh;
+    padding: -2.1vh -2.1vw;
+    background-color: #3BA4FF;
+    border-radius: 0.2vw;
+    /*filter: brightness(0) invert(0);*/
+}
+/* 페이지 버튼 */
+.page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3vh 0.6vw;
+    cursor: pointer;
+    background-color: transparent;
+    color: #333;
+}
+
+.page-btn.active {
+    background-color: transparent;
+    color: #3BA4FF;
+    font-weight: 700;
+    border: none;
+}
+
+/* 화살표 버튼 hover 효과 */
+.page-btn:hover {
+    background-color: transparent;
+    color: #3BA4FF;
+}
+
+/* "데이터 없음" 래퍼 */
+#noDataWrapper {
+    z-index: 100;
+}
 
 /* 선택된 데이터 없음 */
 .no-data {
@@ -205,6 +299,7 @@ body {
     top: 55%; /* 아이콘 아래 위치 */
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 101;
 }
 
 .icon-box {
@@ -218,6 +313,7 @@ body {
     transform: translate(-50%, -50%); /* 정확한 중앙 정렬 */
     margin: 0 auto;
     margin-top: 2vh;        /* 상단 여백 */
+    z-index: 101;
 }
 
 .icon {
@@ -229,4 +325,56 @@ body {
     border: none;
     transform: none; 
     border-radius: 0.5vw; /* 둥근 모서리 유지 */
+}
+
+.table-container {
+    width: 98%;
+    height: 95%; /* 예: 남은 공간 */
+    left: 1%;
+    overflow-x: auto; /* 가로 스크롤 */
+    overflow-y: auto; /* 세로 스크롤 */
+    position: relative;
+    margin-top: 1rem; /* 간격 */
+    background: #fff;
+    z-index: 1;
+}
+
+/* (3) 열 크기 조절을 위해 table-layout: fixed + resizable th */
+#bookTable {
+    table-layout: fixed; 
+    min-width: 100%; /* 열이 많다면 넉넉히 설정 */
+    border-collapse: collapse;
+}
+
+/* 열 헤더/셀 스타일 */
+#bookTable td {
+    width: 8vw; /* 예시로, 모든 열에 150px */
+    border: 0.1vw solid #ccc;
+    padding: 0.5vw;
+    box-sizing: border-box;
+    position: relative;
+}
+
+#bookTable th {
+    position: sticky;
+    top: 0;              /* 상단에서 0 px 떨어진 위치에 고정 */
+    z-index: 2;          /* 다른 요소 위에 표시 */
+    background: #fff;    /* 헤더 배경 */
+    width: 8vw; /* 예시로, 모든 열에 150px */
+    border: 0.1vw solid #ccc;
+    padding: 0.5vw;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* 열 헤더의 resizer 핸들 (엑셀처럼) */
+.column-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px; /* 드래그 영역 */
+    height: 100%;
+    cursor: col-resize;
+    background: transparent; /* 보이진 않음, hover하면 색상 가능 */
+    z-index: 10;
 }

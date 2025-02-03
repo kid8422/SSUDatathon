@@ -14,7 +14,6 @@ import os
 import re
 import math
 import json
-from .models import Book
 from django.db.models import Q
 
 @never_cache
@@ -145,3 +144,120 @@ def load_book_info(request):
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
 
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+@login_required(login_url='DB_login')
+def load_rent_info(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            selected_data = data.get('selectedData', [])  # 선택된 데이터 가져오기
+            raw_categories = selected_data['categories']
+            categories = [item.split()[0] for item in raw_categories]
+            years = selected_data['years']
+
+            raw_data_list = []
+
+            with connection.cursor() as cursor:
+                if len(categories) == 10:
+                    for year in years:
+                        cursor.execute(f"""
+                                        SELECT * FROM year_month_count WHERE year = '{year}'
+                                        """)
+                        raw_data = cursor.fetchone()
+                        raw_data_ = raw_data[1:]
+                        raw_data_list.append(raw_data_)
+                        summed_values = [sum(x) for x in zip(*raw_data_list)]
+                else:
+                    query = ' + '.join(f'`{categorie}`' for categorie in categories)
+                    for year in years:
+                        cursor.execute(f"""
+                                        SELECT {query} FROM year_month_count_detail WHERE year = '{year}'
+                                       """)
+                        raw_data = cursor.fetchall()
+                        raw_data_list.append(raw_data)
+                        summed_values = [sum(values) for values in zip(*[map(lambda x: x[0], row) for row in raw_data_list])]
+            
+            print(summed_values)
+            value_json = json.dumps(summed_values)
+
+            return JsonResponse({'success': True, 'data': value_json})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+@login_required(login_url='DB_login')
+def autocomplete(request):
+    if request.method == "POST":
+        data = json.loads(request.body)  # 요청 데이터 파싱
+        title = data.get('title', '')  # 선택된 데이터 가져오기
+        jaum = data.get('jaum', '').replace(' ', '')  # 선택된 데이터 가져오기
+        bulli = data.get('bulli', '').replace(' ', '')
+        with connection.cursor() as cursor:
+            if bulli == jaum:
+                cursor.execute(f"SELECT DISTINCT title FROM book WHERE jaum LIKE '%{jaum}%' LIMIT 5;")
+                book_data = cursor.fetchall()
+            else: 
+                if len(title) >= 3:
+                    cursor.execute(f"SELECT DISTINCT title FROM book WHERE MATCH(title) AGAINST('{title}*' IN BOOLEAN MODE) LIMIT 5;")
+                    book_data = cursor.fetchall()
+                    if len(book_data) == 0:
+                        cursor.execute(f"SELECT DISTINCT title FROM book WHERE MATCH(bulli) AGAINST('{bulli}*' IN BOOLEAN MODE) LIMIT 5;")
+                        book_data = cursor.fetchall()
+                else:
+                    cursor.execute(f"SELECT DISTINCT title FROM book WHERE title LIKE '%{title}%' LIMIT 5;")
+                    book_data = cursor.fetchall()
+                    if len(book_data) == 0:
+                        cursor.execute(f"SELECT DISTINCT title FROM book WHERE bulli LIKE '%{bulli}%' LIMIT 5;")
+                        book_data = cursor.fetchall()
+        return JsonResponse({'success': True, 'suggestions': book_data})
+
+
+        
+
+@login_required(login_url='DB_login')
+def book_search(request):
+    if request.method == "POST":
+        data = json.loads(request.body)  # 요청 데이터 파싱
+        title = data.get('title', '')  # 선택된 데이터 가져오기
+        jaum = data.get('jaum', '').replace(' ', '')  # 선택된 데이터 가져오기
+        bulli = data.get('bulli', '').replace(' ', '')
+        with connection.cursor() as cursor:
+            if bulli == jaum:
+                cursor.execute(f"""
+                                SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location
+                                FROM book WHERE MATCH(jaum) AGAINST('+{jaum}*' IN BOOLEAN MODE)
+                                """)
+                book_data = cursor.fetchall()
+            else: 
+                cursor.execute(f"""
+                               SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location
+                               FROM book WHERE MATCH(title) AGAINST('+{title.replace(" ", "* +")}*' IN BOOLEAN MODE);
+                               """)
+                book_data = cursor.fetchall()
+                if len(book_data) == 0:
+                    cursor.execute(f"""
+                               SELECT ID, registration, get_course, DDC, ISBN, title, author, publisher, publication_year, location
+                               FROM book WHERE MATCH(bulli) AGAINST('+{bulli}*' IN BOOLEAN MODE);
+                               """)
+                    book_data = cursor.fetchall()
+        raw_df = pd.DataFrame(book_data, columns=[
+            'ID', '등록일자', '수서방법', '분류코드', 'ISBN', '제목', '저자', '출판사', '출판연도', '소장위치'
+        ])
+        raw_df['등록일자'] = raw_df['등록일자'].astype(str)
+        df_tuples = list(raw_df.itertuples(index=False, name=None))
+        request.session['search_book_data'] = df_tuples
+        return JsonResponse({'success': True, 'bookLen': len(book_data)})
+    
+@login_required(login_url='DB_login')
+def load_book_search(request):
+    if request.method == "POST":
+        data = json.loads(request.body)  # 요청 데이터 파싱
+        page = int(data.get('page', 1))
+        pageSize = int(data.get('pageSize', 25))
+        start = (page - 1) * pageSize
+        end = (page * pageSize)
+        book = request.session.get('search_book_data', {})
+        if end > len(book):
+            end = len(book)
+        book_data = book[start:end].copy()
+        return JsonResponse({'success': True, 'data': book_data})
