@@ -137,11 +137,12 @@ body {
     position: relative;
     width: 33%;
     height: 7vh;
+    cursor: pointer;
 
     background: #3BA4FF;
     border-radius: 0.5vw;
 
-    padding: 0% 3%;
+    padding: 0% 1%;
 
     display: flex;
     justify-content: center;
@@ -149,13 +150,13 @@ body {
 }
 
 .option-img {
+    width: 20%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-left: 5%; /* 아이콘-텍스트 간격 */
     margin-right: 5%; /* 아이콘-텍스트 간격 */
-    width: 50%;
-    height: 50%;
 }
 
 .option-icon {
@@ -166,11 +167,13 @@ body {
 /* 버튼 텍스트 */
 .option-text {
     color: #FFFFFF;
-    font-size: 150%;
+    font-size: 120%;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     text-align: center;
     white-space: nowrap;
+    margin-left: 3%; /* 아이콘-텍스트 간격 */
+    margin-right: 3%; /* 아이콘-텍스트 간격 */
 }
 
 /* 드롭다운 컨테이너 */
@@ -233,22 +236,22 @@ body {
     background: rgba(59, 164, 255, 0.8);
 }
 
-/* 드롭다운 토글 버튼 */
-.toggle-img {
-    cursor: pointer;
-}
 
 /* 토글 아이콘 */
 .toggle-img {
+    width: 20%; /* 부모 대비 아이콘 크기 */
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 1vw;
+    margin-left: 5%; /* 아이콘-텍스트 간격 */
+    margin-right: 5%; /* 아이콘-텍스트 간격 */
+    cursor: pointer;
 }
 
 .toggle-icon {
-    width: 1.6vw;
-    height: 1.6vw;
+    width: 100%;
+    height: 100%;
 }
 
 /* ---------------------- */
@@ -611,6 +614,7 @@ body {
 
 /* (2) 페이지네이션 하단 이동 */
 .pagination-container {
+    user-select: none;          /* 드래그 및 선택 방지 */
     position: absolute;
     left: 50%;
     transform: translate(-50%, 95%); /* 수평 중앙 정렬 */

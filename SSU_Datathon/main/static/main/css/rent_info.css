@@ -45,6 +45,7 @@ body {
     position: relative;         /* 상대 위치 기준 */
     justify-content: center;     /* 가로 중앙 정렬 */
     align-items: center;         /* 세로 중앙 정렬 */
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* 탭 설정 */

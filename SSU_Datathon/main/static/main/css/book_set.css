@@ -316,6 +316,7 @@ body {
 
     display: flex;          /* 버튼 우측 정렬 위해 flex 사용 */
     flex-direction: column; /* 항목을 수직으로 쌓음 */
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* -------- (2) 스크롤바 디자인 -------- */
@@ -616,6 +617,7 @@ body {
     position: relative;
     width: 80%;
     height: 4.5vh;
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 .edit-text {
@@ -640,6 +642,7 @@ body {
     display: flex;
     gap: 0.5vh;
     z-index: 999;
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* 화살표 아이콘 (SVG) */

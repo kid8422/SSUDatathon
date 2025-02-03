@@ -84,6 +84,7 @@ body {
     justify-content: flex-end; /* 오른쪽 정렬 */
     transform: translateY(-100%);
     z-index: 1001;
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* Search Rectangle 스타일 */
@@ -246,6 +247,7 @@ body {
     display: flex;
     gap: 0.5vh;
     z-index: 999;
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* 화살표 아이콘 (SVG) */
@@ -285,6 +287,7 @@ body {
 /* "데이터 없음" 래퍼 */
 #noDataWrapper {
     z-index: 100;
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 /* 선택된 데이터 없음 */

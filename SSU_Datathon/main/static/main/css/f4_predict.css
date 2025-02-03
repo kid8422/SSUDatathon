@@ -154,6 +154,7 @@ canvas#myChart {
     margin-left: 80%; /* 차트와 범례 간격 */
     height: 98%; /* 차트 높이와 동일 */
     align-items: center; /* 막대 높이에 맞춰 정렬 */
+    user-select: none;          /* 드래그 및 선택 방지 */
 }
 
 .hide {
