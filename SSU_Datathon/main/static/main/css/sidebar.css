@@ -88,7 +88,7 @@
     font-size: 1.8rem;
     font-weight: 800;
     color: white;
-    margin-left: 10px; /* 홈 아이콘과 텍스트 사이 간격 */
+    margin-left: 20px; /* 홈 아이콘과 텍스트 사이 간격 */
     white-space: nowrap;
     transition: opacity 0.3s ease;
   }
