@@ -13,6 +13,7 @@
     font-size: 1.5rem;
     z-index: 9999;
     display: none; /* 기본적으로 숨김 */
+    user-select: none; /* 선택 비활성화 */ 
 }
 
 .loading-spinner {
