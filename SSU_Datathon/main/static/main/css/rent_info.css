@@ -195,6 +195,7 @@ body {
     border-top: none;
     border-left: none; 
     user-select: none; /* 선택 비활성화 */
+    background-color: #FFF;
 }
 
 /* 탭 설정 */
@@ -203,6 +204,7 @@ body {
     gap: 0vw;                   /* 버튼 간 간격 */
     position: absolute;         /* 절대 위치 설정 */
     transform: translate(4%, -90%); /* 위쪽으로 이동 */
+    width: 100%;
 }
 
 .select-tab {

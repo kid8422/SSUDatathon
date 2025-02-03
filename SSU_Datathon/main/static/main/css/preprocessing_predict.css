@@ -137,6 +137,7 @@ body {
     padding: 1.5vh;             /* 내부 여백 */
     margin-top: -1vh;
     user-select: none; /* 선택 비활성화 */  
+    background-color: #FFF;
 }
 
 /* 데이터 선택 */
