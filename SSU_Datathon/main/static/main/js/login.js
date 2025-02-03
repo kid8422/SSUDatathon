@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }]
     },
     options: {
-      responsive: false,
+      responsive: true,
       plugins: {
         legend: {
           display: false  // 필요시

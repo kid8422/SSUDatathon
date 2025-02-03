@@ -1,5 +1,3 @@
-@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
-
 * {
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
@@ -7,7 +5,6 @@
 
 html,
 body {
-  margin: 0px;
   height: 100%;
 }
 
@@ -20,27 +17,20 @@ a {
   text-decoration: none;
 }
 
-.init {
+.main {
   background-color: #f9f9f9;
   display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.init .div {
-  width: 100%;
-  max-width: 1920px;
-  min-height: 100vh; 
+  width: 100vw;
+  height: 100vh;
   position: relative;
-  background-color: #f9f9f9;
 }
 
 /* 오른쪽 파란색 영역을 화면 오른쪽에 붙이기 + 상단 여백 줄이기 */
-.init .overlap {
+.login-container {
   position: absolute;
   top: 0;
   right: 0;
-  width: 437px;
+  width: 30%;
   height: 100%;
   background-color: #3ba3ff;
 
@@ -49,30 +39,47 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 40px; /* 상단 여백 줄이기 */
-  padding-left: 40px; 
-  padding-right: 40px; 
-  /* 필요에 따라 bottom, padding-bottom 조정 가능 */
 }
 
-/* "HARD CODING" */
-.init .HARD-CODING {
+.login-title {
   text-shadow: 0px 4px 4px #00000040;
   font-family: "Inter-Bold", Helvetica;
   font-weight: 700;
   color: #f9f9f9;
-  font-size: 60px;
-  line-height: 70px;
+  font-size: clamp(3rem, 5vw, 6rem);
+  line-height: 100%;
 
   /* 로그인 폼이 바로 뒤따라오도록 하단 여백은 최소화 */
-  margin-bottom: 40px; 
+  margin-top: 12%;
+  margin-bottom: 12%; 
   text-align: center;
 }
 
 /* 로그인 폼 래퍼: HARD CODING 바로 아래 */
 .login-form {
-  width: 100%;
-  max-width: 350px;
+  width: 70%;
+}
+
+.login-text {
+  font-size: 200%;
+  font-weight: 700;
+  margin-bottom: 7%;
+  color: #FFF;
+}
+
+.login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 가로 정렬 */
+    margin-left: auto; /* 버튼을 오른쪽으로 밀어냄 */
+    background-color: #000;
+    color: #FFF;
+    width: 25%;
+    height: 50%;
+    font-size: 80%;
+    font-weight: 600;
+    border-radius: 0.2vw; 
+    padding: 2% 2%; /* 버튼 크기 조절 */
 }
 
 /* ---------------------------
@@ -105,6 +112,133 @@ a {
 .form-field input:not(:placeholder-shown) + label {
   top: -20px;
   font-size: 14px;
+}
+
+.information-container {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5%;
+    background-color: #f9f9f9;
+}
+
+.information-box {
+  display: flex;
+  flex-direction: row;
+  gap: 5%;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 30%;
+}
+
+/* 개별 정보 테이블 (둥근 모서리 + 테두리 추가) */
+.information-table {
+  width: 40%;
+  height: 100%;
+  background-color: #fff;
+  border: 0.2vw solid #3BA4FF; /* 테두리 색 */
+  border-radius: 0.2vw; /* 둥근 모서리 */
+  padding: 1.5% 3%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  justify-content: space-between; /* 좌우 정렬 */
+}
+
+/* 정보 테이블 내부 텍스트 */
+.text-location {
+  font-size: clamp(1rem, 3vw, 4rem);
+  font-weight: bold;
+  color: #000;
+  text-align: left;
+  margin-right: auto;
+  white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.text-count {
+  font-size: clamp(1rem, 2.8vw, 3.6rem);
+  font-weight: 600;
+  color: #000;
+  text-align: right;
+  margin-left: auto; /* 버튼을 오른쪽으로 밀어냄 */
+  white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+
+/* 차트 컨테이너 - 가로 정렬 */
+.chart-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5% 3%;
+  width: 100%;
+  height: 70%;
+}
+
+/* 차트 정보 (좌측 카테고리 리스트) - 세로 정렬 */
+.chart-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 20%;
+    height: 100%;
+    flex-wrap: wrap; /* 가로 정렬, 줄 바꿈 허용 */
+    gap: 1%; /* 요소 간격 일정하게 유지 */
+    justify-content: center; /* 가운데 정렬 */
+    margin-left: 5%;
+}
+
+.chart-info-text-box {
+    display: flex;
+    align-items: center;
+    width: 100%; /* 부모 요소 너비에 맞춤 */
+    height: 9%
+}
+
+/* 카테고리 리스트 내 개별 요소 */
+.chart-info-text {
+  font-size: clamp(1rem, 1.3vw, 3.6rem);
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  flex: 0 0 70%; /* 너비를 전체 박스의 70% 차지 */
+}
+
+/* 작은 사각형 색상 태그 */
+.square-tag {
+    display: inline-block;
+    width: 30%;
+    height: 100%;
+    padding: 2% 3%;
+    border-radius: 0.5vw;
+    font-size: 100%;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+}
+
+/* 차트 박스 (캔버스) */
+.chart-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 100%;
+}
+
+.myChart {
+  width: 100%;
+  height: 100%;
 }
 
 /* (B) "권 보존서고" & "권 4층 인문" 박스 */
@@ -201,16 +335,6 @@ a {
 }
 
 /* 네모박스(.square-tag) */
-.square-tag {
-  display: inline-block;
-  min-width: 45px;
-  padding: 2px 6px;
-  background-color: #19aa51;
-  color: #ffffff;
-  text-align: center;
-  border-radius: 4px;
-  font-weight: bold;
-}
 .square-tag[data-code="000"] {
   background-color: #19aa51;
 }
@@ -240,69 +364,4 @@ a {
 }
 .square-tag[data-code="900"] {
   background-color: #8121C2;
-}
-
-/* ---------------------------
-   반응형(Mobile, Tablet)
-   --------------------------- */
-@media (max-width: 1024px) {
-  /* 파란색 영역을 절대 위치 대신 전체 폭 사용 */
-  .init .overlap {
-    position: relative;
-    right: auto;
-    width: 100%;
-    height: auto;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  /* HARD CODING 글자 크기 축소 */
-  .init .HARD-CODING {
-    font-size: 50px;
-    line-height: 60px;
-  }
-
-  /* 로그인 폼을 중앙 정렬 */
-  .login-form {
-    margin: 0 auto;
-    max-width: 300px;
-  }
-
-  /* 두 개의 박스 위치를 세로로 배치 */
-  .init .element-3,
-  .init .div-wrapper {
-    position: static;
-    width: auto;
-    height: auto;
-    margin: 20px auto;
-    max-width: 350px;
-  }
-
-  /* 코드 리스트 & 파이차트 세로 배치 */
-  .init .group-3 {
-    position: static;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    align-items: center;
-  }
-
-  /* 파이차트 캔버스 축소 */
-  .piechart-area canvas {
-    width: 300px !important;
-    height: 300px !important;
-  }
-}
-
-@media (max-width: 576px) {
-  .init .HARD-CODING {
-    font-size: 40px;
-    line-height: 50px;
-  }
-  .piechart-area canvas {
-    width: 250px !important;
-    height: 250px !important;
-  }
 }
