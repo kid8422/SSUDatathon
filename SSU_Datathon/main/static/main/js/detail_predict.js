@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 초기 pageSize=25에 대한 최대 페이지 수 로딩 
         maxPages = await load_max_page_len(pageSize);
     } catch (error) {
-        console.error("최대 페이지 수 로드 오류:", error);
     }
     
     async function updateMaxPageAndReload() {
@@ -21,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentPage = 1;
             loadTableData();
         } catch (err) {
-            console.error("update max page error:", err);
         }
     }
 
@@ -293,7 +291,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         테이블 데이터 로드
     ================================ */
     async function loadTableData() {
-        console.log("Load data -> page:", currentPage, "pageSize:", pageSize);
         try {
             const res = await fetchWithLoading(LOADBOOKDATA, {
                 method: "POST",
@@ -305,11 +302,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const json = await res.json();
             const results = json.data || [];
-            console.log(json);
             renderTable(results);
             renderPagination();
         } catch (err) {
-            console.error("loadTableData error:", err);
         }
     }
 
@@ -325,10 +320,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const data = await response.json();
             // data.data 에 최대 페이지 수가 있다고 가정
-            console.log("load_max_page_len 응답:", data.data);
             return data.data; 
         } catch (error) {
-            console.error("최대 페이지 수 요청 오류:", error);
             return 1; // 오류 시 1
         }
     }
@@ -372,7 +365,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return data;
       }
       catch (error) {
-          console.error(error);
           return []; // 오류 발생 시 빈 배열 반환
       }
     }
@@ -382,7 +374,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveBtnInDownload.addEventListener('click', async function () {
       try {
           const data = await downloadBookData(); // 데이터를 변수에 저장
-          console.log(data)
 
           downloadModal.classList.remove('show');
           if (data.length > 0) {
@@ -421,7 +412,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
       }
       catch (error) {
-        console.error(error);
       }
     });
 });

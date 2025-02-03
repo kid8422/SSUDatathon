@@ -46,20 +46,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 body: JSON.stringify({ book: predict_data, location: selectedLocation})
             }).then(response => response.json())  // 응답을 JSON으로 변환
             .then(data => {
-                console.log("✅ SAVEBOOKDATA 요청 완료", data);
                 
                 // 서버에서 응답을 받은 후 이동
                 if (data.success) {
                     location.href = MOVEDETAIL;
                 } else {
-                    console.error("❌ 서버 응답 실패", data);
                 }
             })
             .catch(error => {
-                console.error("❌ SAVEBOOKDATA 요청 실패:", error);
             });
         } catch (error) {
-            console.log("이동 중 오류 발생:", error);
         }
     });
 
@@ -104,7 +100,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             actualData = JSON.parse(result.actualData);
             parsedData = JSON.parse(result.data);
             predict_data = result.predict;
-            console.log(predict_data);
 
             if (parsedData && parsedData.length === 10) {
                 drawHorizontalBarChart(actualData, parsedData);

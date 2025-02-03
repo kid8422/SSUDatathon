@@ -10,9 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 초기 pageSize=25에 대한 최대 페이지 수 로딩
         maxPages = await load_max_page_len(pageSize);
-        console.log("최대 페이지 수:", maxPages);
     } catch (error) {
-        console.error("최대 페이지 수 로드 오류:", error);
     }
     
     async function updateMaxPageAndReload() {
@@ -21,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentPage = 1;
             loadTableData();
         } catch (err) {
-            console.error("update max page error:", err);
         }
     }
 
@@ -284,7 +281,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         테이블 데이터 로드
     ================================ */
     async function loadTableData() {
-        console.log("Load data -> page:", currentPage, "pageSize:", pageSize);
         try {
             const res = await fetchWithLoading(LOADBOOKDATA, {
                 method: "POST",
@@ -299,7 +295,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTable(results);
             renderPagination();
         } catch (err) {
-            console.error("loadTableData error:", err);
         }
     }
 
@@ -314,11 +309,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({ pageSize: pageSize }),
             });
             const data = await response.json();
-            // data.data 에 최대 페이지 수가 있다고 가정
-            console.log("load_max_page_len 응답:", data.data);
             return data.data; 
         } catch (error) {
-            console.error("최대 페이지 수 요청 오류:", error);
             return 1; // 오류 시 1
         }
     }
@@ -454,7 +446,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert(result.message);
             }
         } catch (error) {
-            console.error("가져오기 요청 중 오류:", error);
             alert("오류가 발생했습니다. 관리자에게 문의하세요.");
         }
     });
@@ -559,7 +550,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return data;
       }
       catch (error) {
-          console.error(error);
           return []; // 오류 발생 시 빈 배열 반환
       }
     }
@@ -569,7 +559,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveBtnInDownload.addEventListener('click', async function () {
       try {
           const data = await downloadBookData(); // 데이터를 변수에 저장
-          console.log(data)
 
           downloadModal.classList.remove('show');
           if (data.length > 0) {
@@ -608,7 +597,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
       }
       catch (error) {
-        console.error(error);
       }
     });
 
@@ -723,7 +711,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert(result.message);
           }
         } catch (error) {
-          console.error("저장 요청 중 오류 발생:", error);
           alert("오류가 발생했습니다. 다시 시도하세요.");
         }
       });
@@ -818,7 +805,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert(result.message || "수정 실패");
             }
         } catch (error) {
-            console.error("수정 요청 오류:", error);
             alert("오류가 발생했습니다.");
         }
     });
@@ -828,7 +814,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // bookData 예: {
         //   id: "SS_000012", regDate: "2023-01-01", ...
         // }
-        console.log(bookData);
         editBookIdInput.value = bookData[0] || "";
         editBookRegDate.value = bookData[1] || "";
         editBookGetMethod.value = bookData[2] || "";

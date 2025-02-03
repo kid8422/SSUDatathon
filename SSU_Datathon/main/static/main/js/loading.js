@@ -17,12 +17,10 @@ window.fetchWithLoading = async function (url, options = {}) {
         const response = await fetch(url, options);
         return response; // ✅ Response 객체 그대로 반환
     } catch (error) {
-        console.error("fetch error:", error);
         alert("네트워크 오류가 발생했습니다. 다시 시도하세요.");
         throw error;
     } finally {
         loadingOverlay.style.display = "none";
-        console.log(`⏱ 요청 소요 시간: ${(performance.now() - startTime).toFixed(2)}ms`);
     }
 };
 
